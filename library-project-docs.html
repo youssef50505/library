@@ -1,0 +1,2240 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Library Management System — Project Documentation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;900&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --ink:        #1a1209;
+    --cream:      #f5f0e8;
+    --parchment:  #ede5d4;
+    --gold:       #c5952a;
+    --gold-light: #e8c46a;
+    --rust:       #9b3a1e;
+    --jade:       #1e6b4a;
+    --jade-light: #2a9966;
+    --sky:        #1c4e7a;
+    --sky-light:  #2d7abf;
+    --muted:      #7a6f60;
+    --border:     #d4c8b0;
+    --card-bg:    #faf7f1;
+    --code-bg:    #16120a;
+    --code-string:#e8c46a;
+    --code-kw:    #e06c75;
+    --code-fn:    #61afef;
+    --code-num:   #d19a66;
+    --code-cmnt:  #5c6370;
+    --code-cls:   #e5c07b;
+    --code-ann:   #56b6c2;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--cream);
+    color: #ffa8a8;
+    font-family: 'Cairo', sans-serif;
+    font-size: 16px;
+    line-height: 1.8;
+    overflow-x: hidden;
+  }
+
+  /* ==================== NOISE TEXTURE ==================== */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+    opacity: .4;
+  }
+
+  /* ==================== SIDEBAR NAV ==================== */
+  .sidebar {
+    position: fixed;
+    right: 0;
+    top: 0;
+    width: 270px;
+    height: 100vh;
+    background: var(--ink);
+    padding: 32px 0;
+    overflow-y: auto;
+    z-index: 100;
+    border-left: 3px solid var(--gold);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .sidebar-logo {
+    padding: 0 24px 28px;
+    border-bottom: 1px solid rgba(197,149,42,0.25);
+    margin-bottom: 20px;
+  }
+
+  .sidebar-logo .logo-icon {
+    font-size: 2rem;
+    display: block;
+    margin-bottom: 8px;
+  }
+
+  .sidebar-logo h2 {
+    font-family: 'Crimson Pro', serif;
+    color: var(--gold);
+    font-size: 1.05rem;
+    font-weight: 600;
+    line-height: 1.4;
+  }
+
+  .sidebar-logo p {
+    color: rgba(245,240,232,0.45);
+    font-size: 0.72rem;
+    margin-top: 4px;
+    direction: ltr;
+    text-align: left;
+  }
+
+  .nav-section-title {
+    color: rgba(197,149,42,0.6);
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 0 24px;
+    margin: 16px 0 6px;
+  }
+
+  .sidebar a {
+    display: block;
+    color: rgba(245,240,232,0.75);
+    text-decoration: none;
+    padding: 7px 24px;
+    font-size: 0.85rem;
+    transition: all 0.2s;
+    border-right: 3px solid transparent;
+    position: relative;
+  }
+
+  .sidebar a:hover {
+    color: var(--gold-light);
+    border-right-color: var(--gold);
+    background: rgba(197,149,42,0.08);
+    padding-right: 28px;
+  }
+
+  /* ==================== MAIN CONTENT ==================== */
+  .main {
+    margin-right: 270px;
+    padding: 0;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ==================== HERO ==================== */
+  .hero {
+    background: var(--ink);
+    background-image:
+      radial-gradient(ellipse 80% 60% at 20% 50%, rgba(197,149,42,0.12) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 80% at 80% 20%, rgba(28,78,122,0.15) 0%, transparent 50%);
+    padding: 80px 72px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero::after {
+    content: '📚';
+    position: absolute;
+    left: 60px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 10rem;
+    opacity: 0.06;
+    pointer-events: none;
+  }
+
+  .hero-eyebrow {
+    color: var(--gold);
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .hero-eyebrow::before {
+    content: '';
+    width: 30px;
+    height: 2px;
+    background: var(--gold);
+    display: inline-block;
+  }
+
+  .hero h1 {
+    font-family: 'Crimson Pro', serif;
+    color: var(--cream);
+    font-size: clamp(2.2rem, 4vw, 3.5rem);
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 12px;
+    letter-spacing: -0.5px;
+  }
+
+  .hero h1 .ar-title {
+    display: block;
+    font-family: 'Cairo', sans-serif;
+    font-size: 0.65em;
+    color: var(--gold-light);
+    font-weight: 500;
+    margin-top: 4px;
+  }
+
+  .hero-desc {
+    color: rgba(245,240,232,0.65);
+    font-size: 1.05rem;
+    max-width: 560px;
+    margin-top: 20px;
+    line-height: 1.9;
+  }
+
+  .hero-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 32px;
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border-radius: 4px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    direction: ltr;
+  }
+
+  .badge-spring { background: rgba(106,190,106,0.15); color: #6abf6a; border: 1px solid rgba(106,190,106,0.3); }
+  .badge-angular { background: rgba(221,0,49,0.12); color: #e0506a; border: 1px solid rgba(221,0,49,0.25); }
+  .badge-pg { background: rgba(51,103,145,0.18); color: #7ab8e8; border: 1px solid rgba(51,103,145,0.35); }
+  .badge-java { background: rgba(237,127,17,0.12); color: #f0b04a; border: 1px solid rgba(237,127,17,0.25); }
+  .badge-ts { background: rgba(49,120,198,0.15); color: #7ab4e8; border: 1px solid rgba(49,120,198,0.3); }
+
+  /* ==================== SECTIONS ==================== */
+  .section {
+    padding: 64px 72px;
+    border-bottom: 1px solid var(--border);
+    animation: fadeUp 0.5s ease both;
+  }
+
+  .section:nth-child(even) {
+    background: var(--card-bg);
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .section-label {
+    color: var(--gold);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    direction: ltr;
+  }
+
+  .section-title {
+    font-family: 'Crimson Pro', serif;
+    font-size: clamp(1.6rem, 2.5vw, 2.2rem);
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 28px;
+    line-height: 1.25;
+    padding-bottom: 16px;
+    border-bottom: 2px solid var(--border);
+    position: relative;
+  }
+
+  .section-title::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    right: 0;
+    width: 60px;
+    height: 2px;
+    background: var(--gold);
+  }
+
+  .section-title .en {
+    font-family: 'Crimson Pro', serif;
+    font-size: 0.6em;
+    color: var(--muted);
+    font-style: italic;
+    font-weight: 400;
+    display: block;
+    margin-top: 4px;
+  }
+
+  p {
+    margin-bottom: 14px;
+    color: #3a3028;
+    font-size: 0.97rem;
+  }
+
+  /* ==================== CODE BLOCKS ==================== */
+  .code-wrap {
+    position: relative;
+    margin: 20px 0;
+    direction: ltr;
+  }
+
+  .code-label {
+    background: var(--gold);
+    color: var(--ink);
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 4px 14px;
+    display: inline-block;
+    border-radius: 4px 4px 0 0;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  pre {
+    background: var(--code-bg);
+    border: 1px solid rgba(197,149,42,0.2);
+    border-radius: 0 8px 8px 8px;
+    padding: 24px;
+    overflow-x: auto;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.82rem;
+    line-height: 1.7;
+    direction: ltr;
+    text-align: left;
+  }
+
+  pre::-webkit-scrollbar { height: 4px; }
+  pre::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); }
+  pre::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 2px; }
+
+  .kw   { color: var(--code-kw); font-style: italic; }
+  .fn   { color: var(--code-fn); }
+  .str  { color: var(--code-string); }
+  .num  { color: var(--code-num); }
+  .cmnt { color: var(--code-cmnt); font-style: italic; }
+  .cls  { color: var(--code-cls); }
+  .ann  { color: var(--code-ann); }
+  .pun  { color: #abb2bf; }
+  .plain { color: #abb2bf; }
+
+  /* ==================== CARDS ==================== */
+  .cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+    margin-top: 24px;
+  }
+
+  .card {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 24px;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+
+  .card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 30px rgba(26,18,9,0.1);
+  }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    left: 0;
+    height: 3px;
+  }
+
+  .card-jade::before  { background: var(--jade); }
+  .card-sky::before   { background: var(--sky-light); }
+  .card-rust::before  { background: var(--rust); }
+  .card-gold::before  { background: var(--gold); }
+
+  .card-icon {
+    font-size: 1.8rem;
+    margin-bottom: 12px;
+    display: block;
+  }
+
+  .card h3 {
+    font-family: 'Crimson Pro', serif;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 8px;
+  }
+
+  .card h3 .ar { font-family: 'Cairo', sans-serif; font-size: 0.85em; color: var(--muted); display: block; font-style: normal; }
+
+  .card p { font-size: 0.88rem; color: var(--muted); margin: 0; }
+
+  /* ==================== ARCH DIAGRAM ==================== */
+  .arch-diagram {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 32px;
+    margin: 28px 0;
+    overflow-x: auto;
+    direction: ltr;
+  }
+
+  /* ==================== LAYER FLOW ==================== */
+  .layer-flow {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    margin: 28px 0;
+    direction: ltr;
+  }
+
+  .layer {
+    display: flex;
+    align-items: stretch;
+    position: relative;
+  }
+
+  .layer-connector {
+    width: 60px;
+    min-width: 60px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: var(--gold);
+    font-size: 1.4rem;
+    padding: 4px 0;
+  }
+
+  .layer-box {
+    flex: 1;
+    padding: 16px 20px;
+    border-radius: 8px;
+    border: 1px solid;
+    margin: 4px 0;
+  }
+
+  .layer-box h4 {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.85rem;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+
+  .layer-box p { font-size: 0.8rem; margin: 0; }
+
+  .layer-ctrl  { background: rgba(155,58,30,0.07);  border-color: rgba(155,58,30,0.3); }
+  .layer-ctrl h4 { color: var(--rust); }
+  .layer-svc   { background: rgba(30,107,74,0.07);  border-color: rgba(30,107,74,0.3); }
+  .layer-svc h4 { color: var(--jade); }
+  .layer-repo  { background: rgba(28,78,122,0.07);  border-color: rgba(28,78,122,0.3); }
+  .layer-repo h4 { color: var(--sky); }
+  .layer-ent   { background: rgba(197,149,42,0.08); border-color: rgba(197,149,42,0.3); }
+  .layer-ent h4 { color: var(--gold); }
+  .layer-dto   { background: rgba(128,100,200,0.07); border-color: rgba(128,100,200,0.3); }
+  .layer-dto h4 { color: #8064c8; }
+
+  /* ==================== API TABLE ==================== */
+  .api-table-wrap {
+    overflow-x: auto;
+    margin-top: 24px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    direction: ltr;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.87rem;
+  }
+
+  thead {
+    background: var(--ink);
+    color: var(--gold);
+  }
+
+  thead th {
+    padding: 14px 18px;
+    text-align: left;
+    font-weight: 700;
+    font-size: 0.78rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  tbody tr {
+    border-bottom: 1px solid var(--border);
+    transition: background 0.15s;
+  }
+
+  tbody tr:hover { background: rgba(197,149,42,0.05); }
+  tbody tr:last-child { border-bottom: none; }
+
+  td {
+    padding: 12px 18px;
+    color: var(--ink);
+    vertical-align: top;
+  }
+
+  .method {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 4px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    font-weight: 700;
+    min-width: 62px;
+    text-align: center;
+  }
+
+  .method-get    { background: rgba(30,107,74,0.12);  color: #1e6b4a; border: 1px solid rgba(30,107,74,0.3); }
+  .method-post   { background: rgba(28,78,122,0.12);  color: #1c4e7a; border: 1px solid rgba(28,78,122,0.3); }
+  .method-put    { background: rgba(197,149,42,0.12); color: #a07820; border: 1px solid rgba(197,149,42,0.3); }
+  .method-delete { background: rgba(155,58,30,0.1);   color: #9b3a1e; border: 1px solid rgba(155,58,30,0.25); }
+
+  .endpoint-path {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.82rem;
+    color: var(--sky);
+  }
+
+  /* ==================== ER DIAGRAM ==================== */
+  .er-wrap {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 32px;
+    margin: 28px 0;
+    direction: ltr;
+    text-align: center;
+  }
+
+  /* ==================== FOLDER TREE ==================== */
+  .tree {
+    background: var(--code-bg);
+    border: 1px solid rgba(197,149,42,0.2);
+    border-radius: 10px;
+    padding: 24px 28px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.82rem;
+    line-height: 1.9;
+    direction: ltr;
+    text-align: left;
+    color: #abb2bf;
+  }
+
+  .tree .folder { color: var(--gold-light); font-weight: 700; }
+  .tree .file-java { color: #e06c75; }
+  .tree .file-ts { color: #7ab4e8; }
+  .tree .file-html { color: #e8c46a; }
+  .tree .file-props { color: #56b6c2; }
+  .tree .file-xml { color: #c678dd; }
+
+  /* ==================== SETUP STEPS ==================== */
+  .steps { list-style: none; counter-reset: step; margin-top: 20px; }
+
+  .steps li {
+    counter-increment: step;
+    display: flex;
+    gap: 18px;
+    align-items: flex-start;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .steps li:last-child { border-bottom: none; }
+
+  .steps li::before {
+    content: counter(step);
+    min-width: 32px;
+    height: 32px;
+    background: var(--ink);
+    color: var(--gold);
+    font-family: 'Crimson Pro', serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .steps li strong { display: block; margin-bottom: 4px; font-size: 0.95rem; }
+  .steps li p { margin: 0; font-size: 0.88rem; color: var(--muted); }
+
+  code {
+    background: rgba(197,149,42,0.12);
+    border: 1px solid rgba(197,149,42,0.25);
+    padding: 1px 7px;
+    border-radius: 4px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.82em;
+    color: #8a6a10;
+    direction: ltr;
+    display: inline-block;
+  }
+
+  /* ==================== HIGHLIGHT BOX ==================== */
+  .highlight-box {
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin: 16px 0;
+    border-right: 4px solid;
+    font-size: 0.92rem;
+  }
+
+  .hb-info  { background: rgba(28,78,122,0.08);  border-color: var(--sky-light);  color: #1c4e7a; }
+  .hb-warn  { background: rgba(197,149,42,0.1);  border-color: var(--gold);       color: #7a5810; }
+  .hb-tip   { background: rgba(30,107,74,0.08);  border-color: var(--jade);       color: #1e5038; }
+  .hb-danger{ background: rgba(155,58,30,0.08);  border-color: var(--rust);       color: #7a2e18; }
+
+  .hb-icon { font-size: 1.1rem; margin-left: 8px; }
+
+  /* ==================== TWO COL ==================== */
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 28px;
+    margin-top: 24px;
+  }
+
+  @media (max-width: 900px) { .two-col { grid-template-columns: 1fr; } }
+
+  /* ==================== FOOTER ==================== */
+  .footer {
+    background: var(--ink);
+    color: rgba(245,240,232,0.5);
+    text-align: center;
+    padding: 36px 72px;
+    font-size: 0.85rem;
+    direction: rtl;
+  }
+
+  .footer strong { color: var(--gold); }
+
+  /* ==================== ENTITY BOX (ER) ==================== */
+  .entity-box {
+    display: inline-block;
+    border: 2px solid;
+    border-radius: 8px;
+    overflow: hidden;
+    min-width: 200px;
+    text-align: left;
+    vertical-align: top;
+    direction: ltr;
+  }
+
+  .entity-header {
+    padding: 10px 16px;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700;
+    font-size: 0.88rem;
+    text-align: center;
+  }
+
+  .entity-field {
+    padding: 6px 14px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.78rem;
+    border-top: 1px solid rgba(0,0,0,0.1);
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  .field-key { color: var(--gold); font-weight: 700; }
+  .field-type { color: var(--muted); font-size: 0.72em; }
+
+  .entity-author { border-color: var(--jade); }
+  .entity-author .entity-header { background: var(--jade); color: white; }
+  .entity-author .entity-field { background: rgba(30,107,74,0.04); }
+
+  .entity-book { border-color: var(--sky); }
+  .entity-book .entity-header { background: var(--sky); color: white; }
+  .entity-book .entity-field { background: rgba(28,78,122,0.04); }
+
+  /* ==================== RELATION ==================== */
+  .er-relation {
+    display: inline-flex;
+    align-items: center;
+    gap: 0;
+    margin: 0 24px;
+    vertical-align: top;
+    padding-top: 62px;
+  }
+
+  .rel-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--muted);
+    padding: 4px 8px;
+    background: var(--parchment);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+  }
+
+  .rel-line {
+    width: 40px;
+    height: 2px;
+    background: var(--border);
+  }
+
+  /* ==================== SCROLL TOP ==================== */
+  .scroll-top {
+    position: fixed;
+    bottom: 28px;
+    left: 28px;
+    width: 44px;
+    height: 44px;
+    background: var(--ink);
+    border: 2px solid var(--gold);
+    border-radius: 50%;
+    color: var(--gold);
+    font-size: 1.1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    z-index: 200;
+    transition: all 0.2s;
+  }
+
+  .scroll-top:hover {
+    background: var(--gold);
+    color: var(--ink);
+    transform: translateY(-2px);
+  }
+
+  /* ==================== RESPONSIVE ==================== */
+  @media (max-width: 960px) {
+    .sidebar { display: none; }
+    .main { margin-right: 0; }
+    .section, .hero { padding: 48px 28px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ==================== SIDEBAR ==================== -->
+<nav class="sidebar">
+  <div class="sidebar-logo">
+    <span class="logo-icon">📚</span>
+    <h2>Library Management System</h2>
+    <p>Spring Boot + Angular · Full Stack</p>
+  </div>
+
+  <span class="nav-section-title">المحتوى</span>
+  <a href="#overview">نظرة عامة على المشروع</a>
+  <a href="#architecture">المعمارية العامة</a>
+  <a href="#backend">الـ Backend</a>
+  <a href="#entities">الـ Entities</a>
+  <a href="#dto">الـ DTO Pattern</a>
+  <a href="#repository">الـ Repository</a>
+  <a href="#service">الـ Service Layer</a>
+  <a href="#controller">الـ Controllers</a>
+  <a href="#exception">معالجة الأخطاء</a>
+  <a href="#cors">إعداد الـ CORS</a>
+  <a href="#frontend">الـ Frontend</a>
+  <a href="#models">الـ Models</a>
+  <a href="#services-fe">الـ Services</a>
+  <a href="#components">الـ Components</a>
+  <a href="#routing">الـ Routing</a>
+  <a href="#er">قاعدة البيانات</a>
+  <a href="#api">الـ API Reference</a>
+  <a href="#setup">تشغيل المشروع</a>
+  <a href="#structure">هيكل الملفات</a>
+</nav>
+
+<!-- ==================== MAIN ==================== -->
+<main class="main">
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-eyebrow">توثيق كامل للمشروع</div>
+    <h1>
+      Library Management System
+      <span class="ar-title">نظام إدارة المكتبة</span>
+    </h1>
+    <p class="hero-desc">
+      مشروع متكامل <strong style="color:var(--gold-light)">Full-Stack</strong> لإدارة المكتبات —
+      يتيح إضافة الكتب والمؤلفين وتعديلهم وحذفهم بواجهة مستخدم احترافية.
+      البنية الخلفية مبنية بـ <strong style="color:var(--gold-light)">Spring Boot</strong>
+      ومتصلة بقاعدة بيانات <strong style="color:var(--gold-light)">PostgreSQL</strong>،
+      والواجهة الأمامية مبنية بـ <strong style="color:var(--gold-light)">Angular 19</strong>.
+    </p>
+    <div class="hero-badges">
+      <span class="badge badge-spring">🍃 Spring Boot</span>
+      <span class="badge badge-java">☕ Java 21</span>
+      <span class="badge badge-angular">🅰️ Angular 19</span>
+      <span class="badge badge-ts">🔷 TypeScript</span>
+      <span class="badge badge-pg">🐘 PostgreSQL</span>
+    </div>
+  </section>
+
+  <!-- ==================== OVERVIEW ==================== -->
+  <section class="section" id="overview">
+    <div class="section-label">Section 01</div>
+    <h2 class="section-title">
+      نظرة عامة على المشروع
+      <span class="en">Project Overview</span>
+    </h2>
+
+    <p>
+      هذا المشروع هو <strong>نظام إدارة مكتبة</strong> يتيح للمستخدمين إدارة بيانات الكتب والمؤلفين عبر واجهة ويب تفاعلية.
+      المشروع مقسّم إلى جزأين رئيسيين:
+    </p>
+
+    <div class="cards-grid">
+      <div class="card card-jade">
+        <span class="card-icon">🖥️</span>
+        <h3>Backend <span class="ar">الجانب الخلفي</span></h3>
+        <p>
+          مبني بـ Spring Boot مع Java 21. يوفر REST API كاملة تشمل عمليات
+          CRUD على الكتب والمؤلفين، ويتصل بقاعدة بيانات PostgreSQL عبر Spring Data JPA.
+        </p>
+      </div>
+      <div class="card card-sky">
+        <span class="card-icon">🌐</span>
+        <h3>Frontend <span class="ar">الجانب الأمامي</span></h3>
+        <p>
+          مبني بـ Angular 19 مع TypeScript. يتواصل مع الـ Backend عبر HTTP requests،
+          ويعرض Dashboard وقوائم للكتب والمؤلفين مع دعم البحث والفلترة.
+        </p>
+      </div>
+      <div class="card card-rust">
+        <span class="card-icon">🗄️</span>
+        <h3>Database <span class="ar">قاعدة البيانات</span></h3>
+        <p>
+          PostgreSQL على المنفذ 5432. جدولان رئيسيان: <code>authors</code>
+          و <code>books</code>، تربطهما علاقة One-to-Many.
+        </p>
+      </div>
+      <div class="card card-gold">
+        <span class="card-icon">⚡</span>
+        <h3>Communication <span class="ar">طريقة التواصل</span></h3>
+        <p>
+          الـ Frontend يتواصل مع الـ Backend عبر RESTful HTTP API.
+          الـ Backend يعمل على المنفذ <code>8080</code>،
+          والـ Frontend على المنفذ <code>4200</code>.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== ARCHITECTURE ==================== -->
+  <section class="section" id="architecture">
+    <div class="section-label">Section 02</div>
+    <h2 class="section-title">
+      المعمارية العامة للمشروع
+      <span class="en">System Architecture</span>
+    </h2>
+
+    <p>
+      المشروع يتبع معمارية <strong>Layered Architecture</strong> في الـ Backend،
+      حيث تمر الطلبات بسلسلة منظّمة من الطبقات، كل طبقة مسؤولة عن مهمة محددة.
+    </p>
+
+    <div class="arch-diagram">
+      <svg viewBox="0 0 820 380" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:820px;display:block;margin:auto;font-family:'JetBrains Mono',monospace;">
+        <!-- Background -->
+        <rect width="820" height="380" fill="#faf7f1" rx="8"/>
+
+        <!-- Browser -->
+        <rect x="20" y="150" width="130" height="80" rx="8" fill="#1c4e7a" stroke="#2d7abf" stroke-width="1.5"/>
+        <text x="85" y="183" text-anchor="middle" fill="white" font-size="11" font-weight="700">Angular</text>
+        <text x="85" y="200" text-anchor="middle" fill="rgba(255,255,255,0.7)" font-size="10">Frontend</text>
+        <text x="85" y="218" text-anchor="middle" fill="#7ab8e8" font-size="10">:4200</text>
+
+        <!-- Arrow 1 -->
+        <path d="M 152 175 L 195 175" stroke="#c5952a" stroke-width="2" fill="none" marker-end="url(#arrowGold)"/>
+        <path d="M 195 205 L 152 205" stroke="#c5952a" stroke-width="2" fill="none" marker-end="url(#arrowGoldR)"/>
+        <text x="173" y="168" text-anchor="middle" fill="#c5952a" font-size="9">HTTP</text>
+        <text x="173" y="222" text-anchor="middle" fill="#c5952a" font-size="9">JSON</text>
+
+        <!-- Controller Layer -->
+        <rect x="197" y="120" width="120" height="140" rx="8" fill="#9b3a1e" fill-opacity="0.1" stroke="#9b3a1e" stroke-width="1.5"/>
+        <text x="257" y="147" text-anchor="middle" fill="#9b3a1e" font-size="11" font-weight="700">Controller</text>
+        <text x="257" y="165" text-anchor="middle" fill="#9b3a1e" font-size="9">@RestController</text>
+        <line x1="205" y1="172" x2="309" y2="172" stroke="#9b3a1e" stroke-width="0.5" stroke-opacity="0.4"/>
+        <text x="257" y="191" text-anchor="middle" fill="#7a2e18" font-size="9">/api/books</text>
+        <text x="257" y="208" text-anchor="middle" fill="#7a2e18" font-size="9">/api/authors</text>
+        <text x="257" y="228" text-anchor="middle" fill="#7a2e18" font-size="9">CRUD Endpoints</text>
+
+        <!-- Arrow 2 -->
+        <path d="M 319 190 L 355 190" stroke="#888" stroke-width="1.5" fill="none" marker-end="url(#arrowGrey)"/>
+
+        <!-- Service Layer -->
+        <rect x="357" y="120" width="120" height="140" rx="8" fill="#1e6b4a" fill-opacity="0.08" stroke="#1e6b4a" stroke-width="1.5"/>
+        <text x="417" y="147" text-anchor="middle" fill="#1e6b4a" font-size="11" font-weight="700">Service</text>
+        <text x="417" y="165" text-anchor="middle" fill="#1e6b4a" font-size="9">@Service</text>
+        <line x1="365" y1="172" x2="469" y2="172" stroke="#1e6b4a" stroke-width="0.5" stroke-opacity="0.4"/>
+        <text x="417" y="191" text-anchor="middle" fill="#1e5038" font-size="9">Business Logic</text>
+        <text x="417" y="208" text-anchor="middle" fill="#1e5038" font-size="9">@Transactional</text>
+        <text x="417" y="228" text-anchor="middle" fill="#1e5038" font-size="9">DTO ↔ Entity</text>
+
+        <!-- Arrow 3 -->
+        <path d="M 479 190 L 515 190" stroke="#888" stroke-width="1.5" fill="none" marker-end="url(#arrowGrey)"/>
+
+        <!-- Repository Layer -->
+        <rect x="517" y="120" width="120" height="140" rx="8" fill="#1c4e7a" fill-opacity="0.08" stroke="#1c4e7a" stroke-width="1.5"/>
+        <text x="577" y="147" text-anchor="middle" fill="#1c4e7a" font-size="11" font-weight="700">Repository</text>
+        <text x="577" y="165" text-anchor="middle" fill="#1c4e7a" font-size="9">JpaRepository</text>
+        <line x1="525" y1="172" x2="629" y2="172" stroke="#1c4e7a" stroke-width="0.5" stroke-opacity="0.4"/>
+        <text x="577" y="191" text-anchor="middle" fill="#163a5e" font-size="9">findAll()</text>
+        <text x="577" y="208" text-anchor="middle" fill="#163a5e" font-size="9">findById()</text>
+        <text x="577" y="228" text-anchor="middle" fill="#163a5e" font-size="9">save() / delete()</text>
+
+        <!-- Arrow 4 -->
+        <path d="M 639 190 L 668 190" stroke="#888" stroke-width="1.5" fill="none" marker-end="url(#arrowGrey)"/>
+
+        <!-- DB -->
+        <rect x="670" y="150" width="130" height="80" rx="8" fill="#2a5c3c" stroke="#1e6b4a" stroke-width="1.5"/>
+        <text x="735" y="183" text-anchor="middle" fill="white" font-size="11" font-weight="700">PostgreSQL</text>
+        <text x="735" y="200" text-anchor="middle" fill="rgba(255,255,255,0.7)" font-size="10">authors / books</text>
+        <text x="735" y="218" text-anchor="middle" fill="#7ab8e8" font-size="10">:5432</text>
+
+        <!-- DTO Box -->
+        <rect x="237" y="290" width="280" height="56" rx="6" fill="rgba(128,100,200,0.08)" stroke="rgba(128,100,200,0.4)" stroke-width="1.5" stroke-dasharray="5,3"/>
+        <text x="377" y="317" text-anchor="middle" fill="#8064c8" font-size="11" font-weight="700">DTO Layer</text>
+        <text x="377" y="335" text-anchor="middle" fill="#6048a8" font-size="9">AuthorDTO / BookDTO — يمنع عرض Entity مباشرة للـ Client</text>
+
+        <!-- Connector from DTO to Controller/Service boundary -->
+        <path d="M 377 290 L 377 260" stroke="rgba(128,100,200,0.5)" stroke-width="1.5" stroke-dasharray="4,3" fill="none"/>
+
+        <!-- Exception Handler -->
+        <rect x="197" y="30" width="440" height="46" rx="6" fill="rgba(155,58,30,0.06)" stroke="rgba(155,58,30,0.3)" stroke-width="1.5" stroke-dasharray="5,3"/>
+        <text x="417" y="53" text-anchor="middle" fill="#9b3a1e" font-size="11" font-weight="700">GlobalExceptionHandler</text>
+        <text x="417" y="68" text-anchor="middle" fill="#7a2e18" font-size="9">@ControllerAdvice — يعترض الأخطاء ويعيدها كـ ErrorResponse موحّد</text>
+
+        <!-- Defs -->
+        <defs>
+          <marker id="arrowGold" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+            <polygon points="0 0, 8 3, 0 6" fill="#c5952a"/>
+          </marker>
+          <marker id="arrowGoldR" markerWidth="8" markerHeight="6" refX="0" refY="3" orient="auto">
+            <polygon points="8 0, 0 3, 8 6" fill="#c5952a"/>
+          </marker>
+          <marker id="arrowGrey" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+            <polygon points="0 0, 8 3, 0 6" fill="#aaa"/>
+          </marker>
+        </defs>
+      </svg>
+    </div>
+
+    <div class="highlight-box hb-tip">
+      <span class="hb-icon">💡</span>
+      <strong>ملاحظة مهمة:</strong> كل طبقة تتكلم فقط مع الطبقة اللي جنبها مباشرة.
+      الـ Controller مش بيتكلم مع الـ Repository مباشرة — لازم يعدي على الـ Service أولاً.
+      ده اسمه <strong>Separation of Concerns</strong>.
+    </div>
+  </section>
+
+  <!-- ==================== BACKEND ==================== -->
+  <section class="section" id="backend">
+    <div class="section-label">Section 03</div>
+    <h2 class="section-title">
+      الـ Backend — Spring Boot
+      <span class="en">Backend Layer Deep Dive</span>
+    </h2>
+
+    <p>
+      الـ Backend مبني على <strong>Spring Boot 4.x</strong> مع <strong>Java 21</strong>.
+      بيشغّل على المنفذ <code>8080</code> ويوفر REST API لكل العمليات.
+    </p>
+
+    <p>
+      الـ pom.xml بيعرّف كل الـ dependencies المطلوبة:
+    </p>
+
+    <div class="code-wrap">
+      <span class="code-label">pom.xml — dependencies</span>
+      <pre><span class="cmnt">&lt;!-- Spring Data JPA — للتعامل مع قاعدة البيانات --&gt;</span>
+<span class="pun">&lt;</span><span class="fn">dependency</span><span class="pun">&gt;</span>
+    <span class="pun">&lt;</span><span class="fn">groupId</span><span class="pun">&gt;</span>org.springframework.boot<span class="pun">&lt;/</span><span class="fn">groupId</span><span class="pun">&gt;</span>
+    <span class="pun">&lt;</span><span class="fn">artifactId</span><span class="pun">&gt;</span>spring-boot-starter-data-jpa<span class="pun">&lt;/</span><span class="fn">artifactId</span><span class="pun">&gt;</span>
+<span class="pun">&lt;/</span><span class="fn">dependency</span><span class="pun">&gt;</span>
+
+<span class="cmnt">&lt;!-- Spring Web MVC — لعمل REST APIs --&gt;</span>
+<span class="pun">&lt;</span><span class="fn">dependency</span><span class="pun">&gt;</span>
+    <span class="pun">&lt;</span><span class="fn">artifactId</span><span class="pun">&gt;</span>spring-boot-starter-webmvc<span class="pun">&lt;/</span><span class="fn">artifactId</span><span class="pun">&gt;</span>
+<span class="pun">&lt;/</span><span class="fn">dependency</span><span class="pun">&gt;</span>
+
+<span class="cmnt">&lt;!-- PostgreSQL Driver —  للاتصال بقاعدة البيانات --&gt;</span>
+<span class="pun">&lt;</span><span class="fn">dependency</span><span class="pun">&gt;</span>
+    <span class="pun">&lt;</span><span class="fn">artifactId</span><span class="pun">&gt;</span>postgresql<span class="pun">&lt;/</span><span class="fn">artifactId</span><span class="pun">&gt;</span>
+    <span class="pun">&lt;</span><span class="fn">scope</span><span class="pun">&gt;</span>runtime<span class="pun">&lt;/</span><span class="fn">scope</span><span class="pun">&gt;</span>
+<span class="pun">&lt;/</span><span class="fn">dependency</span><span class="pun">&gt;</span>
+
+<span class="cmnt">&lt;!-- Lombok — بيوفر كتابة Getters/Setters/Constructors --&gt;</span>
+<span class="pun">&lt;</span><span class="fn">dependency</span><span class="pun">&gt;</span>
+    <span class="pun">&lt;</span><span class="fn">artifactId</span><span class="pun">&gt;</span>lombok<span class="pun">&lt;/</span><span class="fn">artifactId</span><span class="pun">&gt;</span>
+    <span class="pun">&lt;</span><span class="fn">optional</span><span class="pun">&gt;</span>true<span class="pun">&lt;/</span><span class="fn">optional</span><span class="pun">&gt;</span>
+<span class="pun">&lt;/</span><span class="fn">dependency</span><span class="pun">&gt;</span></pre>
+    </div>
+
+    <div class="code-wrap">
+      <span class="code-label">application.properties</span>
+      <pre><span class="cmnt"># اسم التطبيق</span>
+<span class="fn">spring.application.name</span>=<span class="str">library2</span>
+
+<span class="cmnt"># إعدادات قاعدة البيانات PostgreSQL</span>
+<span class="fn">spring.datasource.url</span>=<span class="str">jdbc:postgresql://localhost:5432/project_full_lib</span>
+<span class="fn">spring.datasource.username</span>=<span class="str">postgres</span>
+<span class="fn">spring.datasource.password</span>=<span class="str">password</span>
+<span class="fn">spring.datasource.driver-class-name</span>=<span class="str">org.postgresql.Driver</span>
+
+<span class="cmnt"># Hibernate — بيعمل update للجداول تلقائياً لو في تغيير في الـ Entities</span>
+<span class="fn">spring.jpa.hibernate.ddl-auto</span>=<span class="str">update</span>
+<span class="fn">spring.jpa.database-platform</span>=<span class="str">org.hibernate.dialect.PostgreSQLDialect</span>
+
+<span class="cmnt"># بيطبع الـ SQL queries في الـ console (مفيد للـ debugging)</span>
+<span class="fn">spring.jpa.show-sql</span>=<span class="str">true</span></pre>
+    </div>
+  </section>
+
+  <!-- ==================== ENTITIES ==================== -->
+  <section class="section" id="entities">
+    <div class="section-label">Section 04</div>
+    <h2 class="section-title">
+      الـ Entities — نماذج قاعدة البيانات
+      <span class="en">JPA Entities</span>
+    </h2>
+
+    <p>
+      الـ Entities هي كلاسات Java بيمثّل كل منها جدولاً في قاعدة البيانات.
+      بنستخدم <strong>JPA annotations</strong> عشان نربطها بالجداول،
+      و<strong>Lombok</strong> عشان نوفر كتابة الـ boilerplate code.
+    </p>
+
+    <div class="two-col">
+      <div>
+        <div class="code-wrap">
+          <span class="code-label">Author.java</span>
+          <pre><span class="ann">@Entity</span>
+<span class="ann">@Table</span><span class="pun">(</span>name = <span class="str">"authors"</span><span class="pun">)</span>
+<span class="ann">@Data</span>          <span class="cmnt">// Lombok: getters + setters</span>
+<span class="ann">@NoArgsConstructor</span> <span class="cmnt">// Lombok: constructor فارغ</span>
+<span class="ann">@AllArgsConstructor</span><span class="cmnt">// Lombok: constructor بكل الـ fields</span>
+<span class="kw">public class</span> <span class="cls">Author</span> <span class="pun">{</span>
+
+    <span class="ann">@Id</span>
+    <span class="ann">@GeneratedValue</span><span class="pun">(</span>strategy = GenerationType.IDENTITY<span class="pun">)</span>
+    <span class="kw">private</span> <span class="cls">Long</span> id<span class="pun">;</span>
+
+    <span class="ann">@Column</span><span class="pun">(</span>nullable = <span class="kw">false</span><span class="pun">)</span>
+    <span class="kw">private</span> <span class="cls">String</span> name<span class="pun">;</span>  <span class="cmnt">// إلزامي</span>
+
+    <span class="kw">private</span> <span class="cls">String</span> bio<span class="pun">;</span>    <span class="cmnt">// اختياري</span>
+
+    <span class="cmnt">// علاقة One-to-Many: مؤلف واحد ← كتب كتير</span>
+    <span class="ann">@OneToMany</span><span class="pun">(</span>
+        mappedBy = <span class="str">"author"</span><span class="pun">,</span>
+        cascade = CascadeType.ALL<span class="pun">,</span>
+        fetch = FetchType.LAZY <span class="cmnt">// بيجيب الكتب بس لما تطلبهم</span>
+    <span class="pun">)</span>
+    <span class="kw">private</span> <span class="cls">List</span><span class="pun">&lt;</span><span class="cls">Book</span><span class="pun">&gt;</span> books<span class="pun">;</span>
+<span class="pun">}</span></pre>
+        </div>
+      </div>
+      <div>
+        <div class="code-wrap">
+          <span class="code-label">Book.java</span>
+          <pre><span class="ann">@Entity</span>
+<span class="ann">@Table</span><span class="pun">(</span>name = <span class="str">"books"</span><span class="pun">)</span>
+<span class="ann">@Data</span>
+<span class="ann">@NoArgsConstructor</span>
+<span class="ann">@AllArgsConstructor</span>
+<span class="kw">public class</span> <span class="cls">Book</span> <span class="pun">{</span>
+
+    <span class="ann">@Id</span>
+    <span class="ann">@GeneratedValue</span><span class="pun">(</span>strategy = GenerationType.IDENTITY<span class="pun">)</span>
+    <span class="kw">private</span> <span class="cls">Long</span> id<span class="pun">;</span>
+
+    <span class="ann">@Column</span><span class="pun">(</span>nullable = <span class="kw">false</span><span class="pun">)</span>
+    <span class="kw">private</span> <span class="cls">String</span> title<span class="pun">;</span>
+
+    <span class="ann">@Column</span><span class="pun">(</span>nullable = <span class="kw">false</span><span class="pun">,</span> unique = <span class="kw">true</span><span class="pun">)</span>
+    <span class="kw">private</span> <span class="cls">String</span> isbn<span class="pun">;</span>  <span class="cmnt">// فريد — مش ينتكرر</span>
+
+    <span class="kw">private</span> <span class="kw">int</span> publicationYear<span class="pun">;</span>
+
+    <span class="cmnt">// علاقة Many-to-One: كتب كتير ← مؤلف واحد</span>
+    <span class="ann">@ManyToOne</span><span class="pun">(</span>fetch = FetchType.LAZY<span class="pun">)</span>
+    <span class="ann">@JoinColumn</span><span class="pun">(</span>name = <span class="str">"author_id"</span><span class="pun">,</span> nullable = <span class="kw">false</span><span class="pun">)</span>
+    <span class="kw">private</span> <span class="cls">Author</span> author<span class="pun">;</span>
+<span class="pun">}</span></pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="highlight-box hb-info">
+      <span class="hb-icon">📌</span>
+      <strong>Cascade + Lazy Loading:</strong>
+      <code>CascadeType.ALL</code> معناها لو حذفنا مؤلف، هتتحذف كتبه تلقائياً.
+      <code>FetchType.LAZY</code> معناها الـ books مش بتتجيب من الـ database غير لما نطلبها فعلاً — ده بيحسّن الـ performance.
+    </div>
+  </section>
+
+  <!-- ==================== DTO ==================== -->
+  <section class="section" id="dto">
+    <div class="section-label">Section 05</div>
+    <h2 class="section-title">
+      الـ DTO Pattern
+      <span class="en">Data Transfer Objects</span>
+    </h2>
+
+    <p>
+      الـ <strong>DTO (Data Transfer Object)</strong> هو كلاس بيتستخدم لنقل البيانات بين الـ layers المختلفة.
+      ليه بنستخدمه بدل ما نبعت الـ Entity مباشرة؟
+    </p>
+
+    <div class="cards-grid" style="grid-template-columns: repeat(3, 1fr)">
+      <div class="card card-jade" style="padding:18px">
+        <span class="card-icon" style="font-size:1.3rem">🔒</span>
+        <h3 style="font-size:0.95rem">الأمان</h3>
+        <p>مش بنكشف كل بيانات الـ Entity. مثلاً لو في password field مش هنبعته.</p>
+      </div>
+      <div class="card card-sky" style="padding:18px">
+        <span class="card-icon" style="font-size:1.3rem">🔄</span>
+        <h3 style="font-size:0.95rem">التحكم في الشكل</h3>
+        <p>ممكن نضيف أو نشيل fields من الـ response. مثلاً بنضيف <code>authorName</code> في الـ BookDTO.</p>
+      </div>
+      <div class="card card-rust" style="padding:18px">
+        <span class="card-icon" style="font-size:1.3rem">⚡</span>
+        <h3 style="font-size:0.95rem">تفادي الـ Infinite Loop</h3>
+        <p>لو بعتنا الـ Entity مباشرة، Author ↔ Book هيعملوا loop لانهائي في الـ JSON serialization.</p>
+      </div>
+    </div>
+
+    <div class="two-col" style="margin-top:24px">
+      <div>
+        <div class="code-wrap">
+          <span class="code-label">AuthorDTO.java</span>
+          <pre><span class="ann">@Data</span>
+<span class="ann">@NoArgsConstructor</span>
+<span class="ann">@AllArgsConstructor</span>
+<span class="kw">public class</span> <span class="cls">AuthorDTO</span> <span class="pun">{</span>
+    <span class="kw">private</span> <span class="cls">Long</span>   id<span class="pun">;</span>
+    <span class="kw">private</span> <span class="cls">String</span> name<span class="pun">;</span>
+    <span class="kw">private</span> <span class="cls">String</span> bio<span class="pun">;</span>
+    <span class="cmnt">// لاحظ: مفيش books list هنا</span>
+    <span class="cmnt">// عشان نتجنب الـ infinite loop</span>
+<span class="pun">}</span></pre>
+        </div>
+      </div>
+      <div>
+        <div class="code-wrap">
+          <span class="code-label">BookDTO.java</span>
+          <pre><span class="ann">@Data</span>
+<span class="ann">@NoArgsConstructor</span>
+<span class="ann">@AllArgsConstructor</span>
+<span class="kw">public class</span> <span class="cls">BookDTO</span> <span class="pun">{</span>
+    <span class="kw">private</span> <span class="cls">Long</span>   id<span class="pun">;</span>
+    <span class="kw">private</span> <span class="cls">String</span> title<span class="pun">;</span>
+    <span class="kw">private</span> <span class="cls">String</span> isbn<span class="pun">;</span>
+    <span class="kw">private</span> <span class="kw">int</span>    publicationYear<span class="pun">;</span>
+    <span class="kw">private</span> <span class="cls">Long</span>   authorId<span class="pun">;</span>
+    <span class="kw">private</span> <span class="cls">String</span> authorName<span class="pun">;</span>
+    <span class="cmnt">// authorName: مش موجودة في الـ Entity</span>
+    <span class="cmnt">// بنضيفها في الـ Service لما بنحوّل</span>
+<span class="pun">}</span></pre>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== REPOSITORY ==================== -->
+  <section class="section" id="repository">
+    <div class="section-label">Section 06</div>
+    <h2 class="section-title">
+      الـ Repository Layer
+      <span class="en">Spring Data JPA Repositories</span>
+    </h2>
+
+    <p>
+      الـ Repository هو الطبقة اللي بتتكلم مع قاعدة البيانات مباشرة.
+      بنستخدم <strong>Spring Data JPA</strong> اللي بيوفّر methods جاهزة زي
+      <code>findAll()</code>، <code>findById()</code>، <code>save()</code>، <code>deleteById()</code>
+      من غير ما نكتب SQL.
+    </p>
+
+    <div class="two-col">
+      <div>
+        <div class="code-wrap">
+          <span class="code-label">AuthorRepository.java</span>
+          <pre><span class="ann">@Repository</span>
+<span class="kw">public interface</span> <span class="cls">AuthorRepository</span>
+        <span class="kw">extends</span> <span class="cls">JpaRepository</span><span class="pun">&lt;</span><span class="cls">Author</span><span class="pun">,</span> <span class="cls">Long</span><span class="pun">&gt; {</span>
+
+    <span class="cmnt">// Spring Data JPA بيوفر تلقائياً:</span>
+    <span class="cmnt">// findAll(), findById(id)</span>
+    <span class="cmnt">// save(author), deleteById(id)</span>
+    <span class="cmnt">// existsById(id), count()</span>
+
+<span class="pun">}</span>  <span class="cmnt">// لا يحتاج أي كود إضافي!</span></pre>
+        </div>
+      </div>
+      <div>
+        <div class="code-wrap">
+          <span class="code-label">BookRepository.java</span>
+          <pre><span class="ann">@Repository</span>
+<span class="kw">public interface</span> <span class="cls">BookRepository</span>
+        <span class="kw">extends</span> <span class="cls">JpaRepository</span><span class="pun">&lt;</span><span class="cls">Book</span><span class="pun">,</span> <span class="cls">Long</span><span class="pun">&gt; {</span>
+
+    <span class="cmnt">// Custom query: بيعمل SQL تلقائياً من اسم الـ method</span>
+    <span class="cmnt">// SELECT * FROM books WHERE author_id = ?</span>
+    <span class="cls">List</span><span class="pun">&lt;</span><span class="cls">Book</span><span class="pun">&gt;</span> <span class="fn">findByAuthorId</span><span class="pun">(</span><span class="cls">Long</span> authorId<span class="pun">);</span>
+
+    <span class="cmnt">// SELECT COUNT(*) > 0 FROM books WHERE isbn = ?</span>
+    <span class="kw">boolean</span> <span class="fn">existsByIsbn</span><span class="pun">(</span><span class="cls">String</span> isbn<span class="pun">);</span>
+<span class="pun">}</span></pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="highlight-box hb-tip">
+      <span class="hb-icon">✨</span>
+      <strong>الـ Method Naming Magic:</strong>
+      Spring Data JPA بتفهم الـ method name وتعمل الـ SQL لوحدها.
+      <code>findByAuthorId</code> = <code>SELECT * FROM books WHERE author_id = ?</code>.
+      و<code>existsByIsbn</code> = <code>SELECT COUNT(*) > 0 FROM books WHERE isbn = ?</code>.
+    </div>
+  </section>
+
+  <!-- ==================== SERVICE ==================== -->
+  <section class="section" id="service">
+    <div class="section-label">Section 07</div>
+    <h2 class="section-title">
+      الـ Service Layer — منطق الأعمال
+      <span class="en">Business Logic Layer</span>
+    </h2>
+
+    <p>
+      الـ Service هي أهم طبقة في التطبيق. هنا بيتنفّذ <strong>منطق الأعمال</strong> (Business Logic).
+      بيأخذ من الـ Controller، يتحقق من البيانات، يتعامل مع الـ Repository، ويرجع نتيجة.
+    </p>
+
+    <div class="code-wrap">
+      <span class="code-label">AuthorService.java — CREATE + UPDATE</span>
+      <pre><span class="ann">@Service</span>
+<span class="kw">public class</span> <span class="cls">AuthorService</span> <span class="pun">{</span>
+
+    <span class="kw">private final</span> <span class="cls">AuthorRepository</span> authorRepository<span class="pun">;</span>
+
+    <span class="cmnt">// Constructor Injection (أحسن من @Autowired)</span>
+    <span class="kw">public</span> <span class="fn">AuthorService</span><span class="pun">(</span><span class="cls">AuthorRepository</span> authorRepository<span class="pun">) {</span>
+        <span class="kw">this</span>.authorRepository = authorRepository<span class="pun">;</span>
+    <span class="pun">}</span>
+
+    <span class="cmnt">// ======= تحويل Entity → DTO =======</span>
+    <span class="kw">private</span> <span class="cls">AuthorDTO</span> <span class="fn">convertToDto</span><span class="pun">(</span><span class="cls">Author</span> author<span class="pun">) {</span>
+        <span class="kw">return new</span> <span class="cls">AuthorDTO</span><span class="pun">(</span>
+            author.<span class="fn">getId</span><span class="pun">(),</span>
+            author.<span class="fn">getName</span><span class="pun">(),</span>
+            author.<span class="fn">getBio</span><span class="pun">()</span>
+        <span class="pun">);</span>
+    <span class="pun">}</span>
+
+    <span class="cmnt">// ======= CREATE =======</span>
+    <span class="ann">@Transactional</span>  <span class="cmnt">// لو في خطأ، بيعمل rollback تلقائي</span>
+    <span class="kw">public</span> <span class="cls">AuthorDTO</span> <span class="fn">createAuthor</span><span class="pun">(</span><span class="cls">AuthorDTO</span> authorDTO<span class="pun">) {</span>
+
+        <span class="cmnt">// Validation — التحقق من البيانات</span>
+        <span class="kw">if</span> <span class="pun">(</span>authorDTO.<span class="fn">getName</span><span class="pun">() ==</span> <span class="kw">null</span> <span class="pun">||</span> authorDTO.<span class="fn">getName</span><span class="pun">().</span><span class="fn">isEmpty</span><span class="pun">()) {</span>
+            <span class="kw">throw new</span> <span class="cls">RuntimeException</span><span class="pun">(</span><span class="str">"Author name must not be empty"</span><span class="pun">);</span>
+        <span class="pun">}</span>
+
+        <span class="cls">Author</span> author = <span class="fn">convertToEntity</span><span class="pun">(</span>authorDTO<span class="pun">);</span>
+        <span class="cls">Author</span> savedAuthor = authorRepository.<span class="fn">save</span><span class="pun">(</span>author<span class="pun">);</span>
+        <span class="kw">return</span> <span class="fn">convertToDto</span><span class="pun">(</span>savedAuthor<span class="pun">);</span>
+    <span class="pun">}</span>
+
+    <span class="cmnt">// ======= UPDATE =======</span>
+    <span class="ann">@Transactional</span>
+    <span class="kw">public</span> <span class="cls">AuthorDTO</span> <span class="fn">updateAuthor</span><span class="pun">(</span><span class="cls">Long</span> id<span class="pun">,</span> <span class="cls">AuthorDTO</span> authorDTO<span class="pun">) {</span>
+        <span class="kw">return</span> authorRepository.<span class="fn">findById</span><span class="pun">(</span>id<span class="pun">).</span><span class="fn">map</span><span class="pun">(</span>existing <span class="pun">-> {</span>
+            existing.<span class="fn">setName</span><span class="pun">(</span>authorDTO.<span class="fn">getName</span><span class="pun">());</span>
+            existing.<span class="fn">setBio</span><span class="pun">(</span>authorDTO.<span class="fn">getBio</span><span class="pun">());</span>
+            <span class="kw">return</span> <span class="fn">convertToDto</span><span class="pun">(</span>authorRepository.<span class="fn">save</span><span class="pun">(</span>existing<span class="pun">));</span>
+        <span class="pun">}).</span><span class="fn">orElseThrow</span><span class="pun">(() -></span>
+            <span class="kw">new</span> <span class="cls">RuntimeException</span><span class="pun">(</span><span class="str">"Author not found with id "</span> + id<span class="pun">)</span>
+        <span class="pun">);</span>
+    <span class="pun">}</span>
+<span class="pun">}</span></pre>
+    </div>
+
+    <div class="code-wrap">
+      <span class="code-label">BookService.java — ميزة خاصة: منع الـ ISBN المكرر</span>
+      <pre><span class="ann">@Transactional</span>
+<span class="kw">public</span> <span class="cls">BookDTO</span> <span class="fn">createBook</span><span class="pun">(</span><span class="cls">BookDTO</span> bookDTO<span class="pun">) {</span>
+
+    <span class="cmnt">// تحقق: هل الـ ISBN موجود مسبقاً؟</span>
+    <span class="kw">if</span> <span class="pun">(</span>bookRepository.<span class="fn">existsByIsbn</span><span class="pun">(</span>bookDTO.<span class="fn">getIsbn</span><span class="pun">())) {</span>
+        <span class="kw">throw new</span> <span class="cls">RuntimeException</span><span class="pun">(</span>
+            <span class="str">"Book with ISBN "</span> + bookDTO.<span class="fn">getIsbn</span><span class="pun">() +</span> <span class="str">" already exists"</span>
+        <span class="pun">);</span>
+    <span class="pun">}</span>
+
+    <span class="cls">Book</span> book = <span class="fn">convertToEntity</span><span class="pun">(</span>bookDTO<span class="pun">);</span>
+    <span class="kw">return</span> <span class="fn">convertToDto</span><span class="pun">(</span>bookRepository.<span class="fn">save</span><span class="pun">(</span>book<span class="pun">));</span>
+<span class="pun">}</span>
+
+<span class="cmnt">// جلب كتب مؤلف معين</span>
+<span class="ann">@Transactional</span><span class="pun">(</span>readOnly = <span class="kw">true</span><span class="pun">)</span>
+<span class="kw">public</span> <span class="cls">List</span><span class="pun">&lt;</span><span class="cls">BookDTO</span><span class="pun">&gt;</span> <span class="fn">getBooksByAuthorId</span><span class="pun">(</span><span class="cls">Long</span> authorId<span class="pun">) {</span>
+
+    <span class="cmnt">// تحقق إن المؤلف موجود أصلاً</span>
+    <span class="kw">if</span> <span class="pun">(!</span>authorRepository.<span class="fn">existsById</span><span class="pun">(</span>authorId<span class="pun">)) {</span>
+        <span class="kw">throw new</span> <span class="cls">RuntimeException</span><span class="pun">(</span><span class="str">"Author not found"</span><span class="pun">);</span>
+    <span class="pun">}</span>
+
+    <span class="kw">return</span> bookRepository.<span class="fn">findByAuthorId</span><span class="pun">(</span>authorId<span class="pun">)</span>
+        .stream<span class="pun">()</span>
+        .map<span class="pun">(</span><span class="kw">this</span>::convertToDto<span class="pun">)</span>
+        .collect<span class="pun">(</span>Collectors.toList<span class="pun">());</span>
+<span class="pun">}</span></pre>
+    </div>
+
+    <div class="highlight-box hb-warn">
+      <span class="hb-icon">⚠️</span>
+      <strong>@Transactional(readOnly = true):</strong>
+      الـ methods اللي بس بتقرأ (مش بتكتب) لازم تستخدم <code>readOnly = true</code>.
+      ده بيحسّن الـ performance لأن Hibernate مش بيتتبع التغييرات.
+    </div>
+  </section>
+
+  <!-- ==================== CONTROLLERS ==================== -->
+  <section class="section" id="controller">
+    <div class="section-label">Section 08</div>
+    <h2 class="section-title">
+      الـ Controllers — نقاط الدخول
+      <span class="en">REST Controllers</span>
+    </h2>
+
+    <p>
+      الـ Controller هو "الباب" اللي بيستقبل الـ HTTP requests من الـ Frontend.
+      <code>@RestController</code> = <code>@Controller</code> + <code>@ResponseBody</code>
+      (يعني بيرجع JSON تلقائياً).
+    </p>
+
+    <div class="code-wrap">
+      <span class="code-label">AuthorController.java — كل الـ Endpoints</span>
+      <pre><span class="ann">@RestController</span>
+<span class="ann">@RequestMapping</span><span class="pun">(</span><span class="str">"/api/authors"</span><span class="pun">)</span>  <span class="cmnt">// الـ base URL</span>
+<span class="kw">public class</span> <span class="cls">AuthorController</span> <span class="pun">{</span>
+
+    <span class="kw">private final</span> <span class="cls">AuthorService</span> authorService<span class="pun">;</span>
+
+    <span class="kw">public</span> <span class="fn">AuthorController</span><span class="pun">(</span><span class="cls">AuthorService</span> authorService<span class="pun">) {</span>
+        <span class="kw">this</span>.authorService = authorService<span class="pun">;</span>
+    <span class="pun">}</span>
+
+    <span class="cmnt">// ===== POST /api/authors — إضافة مؤلف جديد =====</span>
+    <span class="ann">@PostMapping</span>
+    <span class="kw">public</span> <span class="cls">ResponseEntity</span><span class="pun">&lt;</span><span class="cls">AuthorDTO</span><span class="pun">&gt;</span> <span class="fn">createAuthor</span><span class="pun">(</span><span class="ann">@RequestBody</span> <span class="cls">AuthorDTO</span> dto<span class="pun">) {</span>
+        <span class="cls">AuthorDTO</span> created = authorService.<span class="fn">createAuthor</span><span class="pun">(</span>dto<span class="pun">);</span>
+        <span class="kw">return</span> <span class="cls">ResponseEntity</span>.<span class="fn">status</span><span class="pun">(</span>HttpStatus.CREATED<span class="pun">).</span><span class="fn">body</span><span class="pun">(</span>created<span class="pun">);</span>
+        <span class="cmnt">// يرجع HTTP 201 Created</span>
+    <span class="pun">}</span>
+
+    <span class="cmnt">// ===== GET /api/authors — جلب كل المؤلفين =====</span>
+    <span class="ann">@GetMapping</span>
+    <span class="kw">public</span> <span class="cls">ResponseEntity</span><span class="pun">&lt;</span><span class="cls">List</span><span class="pun">&lt;</span><span class="cls">AuthorDTO</span><span class="pun">&gt;&gt;</span> <span class="fn">getAllAuthors</span><span class="pun">() {</span>
+        <span class="kw">return</span> <span class="cls">ResponseEntity</span>.<span class="fn">ok</span><span class="pun">(</span>authorService.<span class="fn">getAllAuthors</span><span class="pun">());</span>
+        <span class="cmnt">// يرجع HTTP 200 OK</span>
+    <span class="pun">}</span>
+
+    <span class="cmnt">// ===== GET /api/authors/{id} — جلب مؤلف بالـ ID =====</span>
+    <span class="ann">@GetMapping</span><span class="pun">(</span><span class="str">"/{id}"</span><span class="pun">)</span>
+    <span class="kw">public</span> <span class="cls">ResponseEntity</span><span class="pun">&lt;</span><span class="cls">AuthorDTO</span><span class="pun">&gt;</span> <span class="fn">getAuthorById</span><span class="pun">(</span><span class="ann">@PathVariable</span> <span class="cls">Long</span> id<span class="pun">) {</span>
+        <span class="kw">return</span> authorService.<span class="fn">getAuthorById</span><span class="pun">(</span>id<span class="pun">)</span>
+            .map<span class="pun">(</span><span class="cls">ResponseEntity</span>::ok<span class="pun">)</span>
+            .orElseThrow<span class="pun">(() -></span> <span class="kw">new</span> <span class="cls">RuntimeException</span><span class="pun">(</span><span class="str">"Author not found"</span><span class="pun">));</span>
+    <span class="pun">}</span>
+
+    <span class="cmnt">// ===== PUT /api/authors/{id} — تعديل مؤلف =====</span>
+    <span class="ann">@PutMapping</span><span class="pun">(</span><span class="str">"/{id}"</span><span class="pun">)</span>
+    <span class="kw">public</span> <span class="cls">ResponseEntity</span><span class="pun">&lt;</span><span class="cls">AuthorDTO</span><span class="pun">&gt;</span> <span class="fn">updateAuthor</span><span class="pun">(</span>
+            <span class="ann">@PathVariable</span> <span class="cls">Long</span> id<span class="pun">,</span> <span class="ann">@RequestBody</span> <span class="cls">AuthorDTO</span> dto<span class="pun">) {</span>
+        <span class="kw">return</span> <span class="cls">ResponseEntity</span>.<span class="fn">ok</span><span class="pun">(</span>authorService.<span class="fn">updateAuthor</span><span class="pun">(</span>id<span class="pun">,</span> dto<span class="pun">));</span>
+    <span class="pun">}</span>
+
+    <span class="cmnt">// ===== DELETE /api/authors/{id} — حذف مؤلف =====</span>
+    <span class="ann">@DeleteMapping</span><span class="pun">(</span><span class="str">"/{id}"</span><span class="pun">)</span>
+    <span class="kw">public</span> <span class="cls">ResponseEntity</span><span class="pun">&lt;</span><span class="cls">Void</span><span class="pun">&gt;</span> <span class="fn">deleteAuthor</span><span class="pun">(</span><span class="ann">@PathVariable</span> <span class="cls">Long</span> id<span class="pun">) {</span>
+        authorService.<span class="fn">deleteAuthor</span><span class="pun">(</span>id<span class="pun">);</span>
+        <span class="kw">return</span> <span class="cls">ResponseEntity</span>.<span class="fn">noContent</span><span class="pun">().</span><span class="fn">build</span><span class="pun">();</span>
+        <span class="cmnt">// يرجع HTTP 204 No Content</span>
+    <span class="pun">}</span>
+<span class="pun">}</span></pre>
+    </div>
+  </section>
+
+  <!-- ==================== EXCEPTION ==================== -->
+  <section class="section" id="exception">
+    <div class="section-label">Section 09</div>
+    <h2 class="section-title">
+      معالجة الأخطاء — GlobalExceptionHandler
+      <span class="en">Global Exception Handling</span>
+    </h2>
+
+    <p>
+      بدل ما كل Controller يعالج الأخطاء لوحده، بنستخدم <strong>@ControllerAdvice</strong>
+      عشان يكون في مكان واحد بيعالج كل الأخطاء في التطبيق.
+    </p>
+
+    <div class="two-col">
+      <div>
+        <div class="code-wrap">
+          <span class="code-label">GlobalExceptionHandler.java</span>
+          <pre><span class="ann">@ControllerAdvice</span>
+<span class="kw">public class</span> <span class="cls">GlobalExceptionHandler</span> <span class="pun">{</span>
+
+  <span class="cmnt">// RuntimeException → 404 Not Found</span>
+  <span class="ann">@ExceptionHandler</span><span class="pun">(</span><span class="cls">RuntimeException</span>.<span class="kw">class</span><span class="pun">)</span>
+  <span class="kw">public</span> <span class="cls">ResponseEntity</span><span class="pun">&lt;</span><span class="cls">ErrorResponse</span><span class="pun">&gt;</span>
+    <span class="fn">handleRuntime</span><span class="pun">(</span><span class="cls">RuntimeException</span> ex<span class="pun">) {</span>
+    <span class="kw">return new</span> <span class="cls">ResponseEntity</span><span class="pun">&lt;&gt;(</span>
+      <span class="kw">new</span> <span class="cls">ErrorResponse</span><span class="pun">(</span>
+        ex.<span class="fn">getMessage</span><span class="pun">(),</span>
+        HttpStatus.NOT_FOUND.value<span class="pun">(),</span>
+        LocalDateTime.now<span class="pun">()</span>
+      <span class="pun">),</span>
+      HttpStatus.NOT_FOUND
+    <span class="pun">);</span>
+  <span class="pun">}</span>
+
+  <span class="cmnt">// Exception → 500 Internal Server Error</span>
+  <span class="ann">@ExceptionHandler</span><span class="pun">(</span><span class="cls">Exception</span>.<span class="kw">class</span><span class="pun">)</span>
+  <span class="kw">public</span> <span class="cls">ResponseEntity</span><span class="pun">&lt;</span><span class="cls">ErrorResponse</span><span class="pun">&gt;</span>
+    <span class="fn">handleGeneral</span><span class="pun">(</span><span class="cls">Exception</span> ex<span class="pun">) {</span>
+    <span class="kw">return new</span> <span class="cls">ResponseEntity</span><span class="pun">&lt;&gt;(</span>
+      <span class="kw">new</span> <span class="cls">ErrorResponse</span><span class="pun">(</span>
+        <span class="str">"Internal Server Error"</span><span class="pun">,</span> <span class="num">500</span><span class="pun">,</span> LocalDateTime.now<span class="pun">()</span>
+      <span class="pun">),</span>
+      HttpStatus.INTERNAL_SERVER_ERROR
+    <span class="pun">);</span>
+  <span class="pun">}</span>
+<span class="pun">}</span></pre>
+        </div>
+      </div>
+      <div>
+        <div class="code-wrap">
+          <span class="code-label">ErrorResponse.java — شكل الـ Error JSON</span>
+          <pre><span class="ann">@Data</span>
+<span class="ann">@AllArgsConstructor</span>
+<span class="kw">public class</span> <span class="cls">ErrorResponse</span> <span class="pun">{</span>
+    <span class="kw">private</span> <span class="cls">String</span>        message<span class="pun">;</span>
+    <span class="kw">private</span> <span class="kw">int</span>           status<span class="pun">;</span>
+    <span class="kw">private</span> <span class="cls">LocalDateTime</span> timestamp<span class="pun">;</span>
+<span class="pun">}</span></pre>
+        </div>
+
+        <div style="margin-top:16px" class="code-wrap">
+          <span class="code-label">Example Error Response — JSON</span>
+          <pre><span class="pun">{</span>
+  <span class="str">"message"</span><span class="pun">:</span> <span class="str">"Author not found with id 99"</span><span class="pun">,</span>
+  <span class="str">"status"</span><span class="pun">:</span>  <span class="num">404</span><span class="pun">,</span>
+  <span class="str">"timestamp"</span><span class="pun">:</span> <span class="str">"2026-04-15T20:00:00"</span>
+<span class="pun">}</span></pre>
+        </div>
+
+        <div class="highlight-box hb-info" style="margin-top:16px">
+          <span class="hb-icon">📌</span>
+          ده بيضمن إن كل الأخطاء بترجع بنفس الشكل الموحّد، سواء كان 404 أو 400 أو 500.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== CORS ==================== -->
+  <section class="section" id="cors">
+    <div class="section-label">Section 10</div>
+    <h2 class="section-title">
+      إعداد الـ CORS
+      <span class="en">Cross-Origin Resource Sharing</span>
+    </h2>
+
+    <p>
+      المتصفح بيمنع تلقائياً أي request من origin مختلف (مثلاً من port 4200 لـ port 8080).
+      الـ <strong>WebConfig</strong> بيحل المشكلة دي.
+    </p>
+
+    <div class="code-wrap">
+      <span class="code-label">WebConfig.java</span>
+      <pre><span class="ann">@Configuration</span>
+<span class="kw">public class</span> <span class="cls">WebConfig</span> <span class="kw">implements</span> <span class="cls">WebMvcConfigurer</span> <span class="pun">{</span>
+
+    <span class="ann">@Override</span>
+    <span class="kw">public void</span> <span class="fn">addCorsMappings</span><span class="pun">(</span><span class="cls">CorsRegistry</span> registry<span class="pun">) {</span>
+        registry
+            .<span class="fn">addMapping</span><span class="pun">(</span><span class="str">"/api/**"</span><span class="pun">)</span>            <span class="cmnt">// كل الـ APIs</span>
+            .<span class="fn">allowedOrigins</span><span class="pun">(</span><span class="str">"http://localhost:4200"</span><span class="pun">)</span> <span class="cmnt">// فقط الـ Angular</span>
+            .<span class="fn">allowedMethods</span><span class="pun">(</span><span class="str">"GET"</span><span class="pun">,</span> <span class="str">"POST"</span><span class="pun">,</span> <span class="str">"PUT"</span><span class="pun">,</span> <span class="str">"DELETE"</span><span class="pun">,</span> <span class="str">"OPTIONS"</span><span class="pun">)</span>
+            .<span class="fn">allowedHeaders</span><span class="pun">(</span><span class="str">"*"</span><span class="pun">)</span>              <span class="cmnt">// أي headers</span>
+            .<span class="fn">allowCredentials</span><span class="pun">(</span><span class="kw">true</span><span class="pun">);</span>          <span class="cmnt">// يسمح بالـ cookies</span>
+    <span class="pun">}</span>
+<span class="pun">}</span></pre>
+    </div>
+  </section>
+
+  <!-- ==================== FRONTEND ==================== -->
+  <section class="section" id="frontend">
+    <div class="section-label">Section 11</div>
+    <h2 class="section-title">
+      الـ Frontend — Angular 19
+      <span class="en">Angular Frontend Architecture</span>
+    </h2>
+
+    <p>
+      الـ Frontend مبني بـ <strong>Angular 19</strong> مع <strong>Standalone Components</strong>
+      (مفيش NgModules). بيتكلم مع الـ Backend عبر <code>HttpClient</code>.
+    </p>
+
+    <div class="layer-flow" style="direction:ltr">
+      <div class="layer">
+        <div class="layer-box layer-ctrl" style="max-width:600px">
+          <h4>🖥️ Components (app.routes.ts)</h4>
+          <p>DashboardComponent · BookListComponent · BookFormComponent · AuthorListComponent · AuthorFormComponent</p>
+        </div>
+      </div>
+      <div class="layer">
+        <div class="layer-connector">↓</div>
+      </div>
+      <div class="layer">
+        <div class="layer-box layer-svc" style="max-width:600px">
+          <h4>⚙️ Services (HTTP Layer)</h4>
+          <p>AuthorService · BookService · ToastService — بيتعاملوا مع الـ HTTP requests وبيرجعوا Observables</p>
+        </div>
+      </div>
+      <div class="layer">
+        <div class="layer-connector">↓</div>
+      </div>
+      <div class="layer">
+        <div class="layer-box layer-repo" style="max-width:600px">
+          <h4>📐 Models (TypeScript Interfaces)</h4>
+          <p>Author interface · Book interface — بيحددوا شكل البيانات</p>
+        </div>
+      </div>
+      <div class="layer">
+        <div class="layer-connector">↕ HTTP/JSON</div>
+      </div>
+      <div class="layer">
+        <div class="layer-box layer-ent" style="max-width:600px; border-color: rgba(197,149,42,0.4)">
+          <h4>🌐 Spring Boot REST API (:8080)</h4>
+          <p>الـ Backend APIs التي عرفناها سابقاً</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="code-wrap">
+      <span class="code-label">app.config.ts — إعداد التطبيق</span>
+      <pre><span class="kw">export const</span> appConfig: <span class="cls">ApplicationConfig</span> = <span class="pun">{</span>
+  providers: <span class="pun">[</span>
+    <span class="cmnt">// Zone.js optimization</span>
+    <span class="fn">provideZoneChangeDetection</span><span class="pun">({</span> eventCoalescing: <span class="kw">true</span> <span class="pun">}),</span>
+
+    <span class="cmnt">// Routing — بيفعّل الـ routes</span>
+    <span class="fn">provideRouter</span><span class="pun">(</span>routes<span class="pun">),</span>
+
+    <span class="cmnt">// HttpClient — عشان نقدر نعمل HTTP requests</span>
+    <span class="fn">provideHttpClient</span><span class="pun">(),</span>
+  <span class="pun">]</span>
+<span class="pun">};</span></pre>
+    </div>
+  </section>
+
+  <!-- ==================== MODELS FE ==================== -->
+  <section class="section" id="models">
+    <div class="section-label">Section 12</div>
+    <h2 class="section-title">
+      الـ Models — TypeScript Interfaces
+      <span class="en">Frontend Data Models</span>
+    </h2>
+
+    <p>
+      الـ TypeScript interfaces بتحدد شكل البيانات اللي الـ Frontend بيشتغل بيها.
+      مطابقة للـ DTOs في الـ Backend.
+    </p>
+
+    <div class="two-col">
+      <div>
+        <div class="code-wrap">
+          <span class="code-label">author.model.ts</span>
+          <pre><span class="kw">export interface</span> <span class="cls">Author</span> <span class="pun">{</span>
+  id<span class="pun">?:</span> <span class="cls">number</span><span class="pun">;</span>    <span class="cmnt">// ? = optional</span>
+  name<span class="pun">:</span> <span class="cls">string</span><span class="pun">;</span>  <span class="cmnt">// إلزامي</span>
+  bio<span class="pun">?:</span> <span class="cls">string</span><span class="pun">;</span>  <span class="cmnt">// اختياري</span>
+<span class="pun">}</span></pre>
+        </div>
+      </div>
+      <div>
+        <div class="code-wrap">
+          <span class="code-label">book.model.ts</span>
+          <pre><span class="kw">export interface</span> <span class="cls">Book</span> <span class="pun">{</span>
+  id<span class="pun">?:</span>             <span class="cls">number</span><span class="pun">;</span>
+  title<span class="pun">:</span>          <span class="cls">string</span><span class="pun">;</span>
+  isbn<span class="pun">:</span>           <span class="cls">string</span><span class="pun">;</span>
+  publicationYear<span class="pun">:</span> <span class="cls">number</span><span class="pun">;</span>
+  authorId<span class="pun">:</span>       <span class="cls">number</span><span class="pun">;</span>  <span class="cmnt">// لازم يكون موجود</span>
+  authorName<span class="pun">?:</span>    <span class="cls">string</span><span class="pun">;</span>  <span class="cmnt">// بييجي من الـ Backend</span>
+<span class="pun">}</span></pre>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== SERVICES FE ==================== -->
+  <section class="section" id="services-fe">
+    <div class="section-label">Section 13</div>
+    <h2 class="section-title">
+      الـ Services — HTTP Communication
+      <span class="en">Angular Services</span>
+    </h2>
+
+    <p>
+      الـ Angular Services هي classes بتتعامل مع الـ HTTP requests.
+      بنستخدم <code>HttpClient</code> اللي بيرجع <strong>Observable</strong>
+      — ده زي الـ Promise بس أقوى منه (ممكن تعمله cancel، وبيدعم streams).
+    </p>
+
+    <div class="two-col">
+      <div>
+        <div class="code-wrap">
+          <span class="code-label">author.service.ts</span>
+          <pre><span class="ann">@Injectable</span><span class="pun">({</span> providedIn: <span class="str">'root'</span> <span class="pun">})</span>
+<span class="kw">export class</span> <span class="cls">AuthorService</span> <span class="pun">{</span>
+
+  <span class="kw">private readonly</span> API =
+    <span class="str">'http://localhost:8080/api/authors'</span><span class="pun">;</span>
+
+  <span class="kw">constructor</span><span class="pun">(</span><span class="kw">private</span> http: <span class="cls">HttpClient</span><span class="pun">) {}</span>
+
+  <span class="fn">getAll</span><span class="pun">():</span> <span class="cls">Observable</span><span class="pun">&lt;</span><span class="cls">Author</span><span class="pun">[]&gt; {</span>
+    <span class="kw">return this</span>.http.<span class="fn">get</span><span class="pun">&lt;</span><span class="cls">Author</span><span class="pun">[]&gt;(</span><span class="kw">this</span>.API<span class="pun">);</span>
+  <span class="pun">}</span>
+
+  <span class="fn">create</span><span class="pun">(</span>author: <span class="cls">Author</span><span class="pun">):</span> <span class="cls">Observable</span><span class="pun">&lt;</span><span class="cls">Author</span><span class="pun">&gt; {</span>
+    <span class="kw">return this</span>.http.<span class="fn">post</span><span class="pun">&lt;</span><span class="cls">Author</span><span class="pun">&gt;(</span><span class="kw">this</span>.API<span class="pun">,</span> author<span class="pun">);</span>
+  <span class="pun">}</span>
+
+  <span class="fn">update</span><span class="pun">(</span>id: <span class="cls">number</span><span class="pun">,</span> a: <span class="cls">Author</span><span class="pun">):</span> <span class="cls">Observable</span><span class="pun">&lt;</span><span class="cls">Author</span><span class="pun">&gt; {</span>
+    <span class="kw">return this</span>.http.<span class="fn">put</span><span class="pun">&lt;</span><span class="cls">Author</span><span class="pun">&gt;(`${</span><span class="kw">this</span>.API<span class="pun">}/${</span>id<span class="pun">}`,</span> a<span class="pun">);</span>
+  <span class="pun">}</span>
+
+  <span class="fn">delete</span><span class="pun">(</span>id: <span class="cls">number</span><span class="pun">):</span> <span class="cls">Observable</span><span class="pun">&lt;</span><span class="kw">void</span><span class="pun">&gt; {</span>
+    <span class="kw">return this</span>.http.<span class="fn">delete</span><span class="pun">&lt;</span><span class="kw">void</span><span class="pun">&gt;(`${</span><span class="kw">this</span>.API<span class="pun">}/${</span>id<span class="pun">}`);</span>
+  <span class="pun">}</span>
+<span class="pun">}</span></pre>
+        </div>
+      </div>
+      <div>
+        <div class="code-wrap">
+          <span class="code-label">toast.service.ts — إشعارات للمستخدم</span>
+          <pre><span class="kw">export interface</span> <span class="cls">Toast</span> <span class="pun">{</span>
+  id: <span class="cls">number</span><span class="pun">;</span>
+  message: <span class="cls">string</span><span class="pun">;</span>
+  type: <span class="str">'success'</span> | <span class="str">'danger'</span> | <span class="str">'warning'</span><span class="pun">;</span>
+<span class="pun">}</span>
+
+<span class="ann">@Injectable</span><span class="pun">({</span> providedIn: <span class="str">'root'</span> <span class="pun">})</span>
+<span class="kw">export class</span> <span class="cls">ToastService</span> <span class="pun">{</span>
+  <span class="cmnt">// signal: الـ Angular 16+ reactivity</span>
+  toasts = <span class="fn">signal</span><span class="pun">&lt;</span><span class="cls">Toast</span><span class="pun">[]&gt;([]);</span>
+  <span class="kw">private</span> counter = <span class="num">0</span><span class="pun">;</span>
+
+  <span class="fn">show</span><span class="pun">(</span>msg: <span class="cls">string</span><span class="pun">,</span> type = <span class="str">'success'</span><span class="pun">) {</span>
+    <span class="kw">const</span> id = ++<span class="kw">this</span>.counter<span class="pun">;</span>
+    <span class="kw">this</span>.toasts.<span class="fn">update</span><span class="pun">(</span>list =>
+      <span class="pun">[...</span>list<span class="pun">,</span> <span class="pun">{</span> id<span class="pun">,</span> message: msg<span class="pun">,</span> type <span class="pun">}]</span>
+    <span class="pun">);</span>
+    <span class="cmnt">// تختفي بعد 3.5 ثانية</span>
+    <span class="fn">setTimeout</span><span class="pun">(() =></span> <span class="kw">this</span>.<span class="fn">remove</span><span class="pun">(</span>id<span class="pun">),</span> <span class="num">3500</span><span class="pun">);</span>
+  <span class="pun">}</span>
+
+  <span class="fn">success</span><span class="pun">(</span>msg: <span class="cls">string</span><span class="pun">) {</span> <span class="kw">this</span>.<span class="fn">show</span><span class="pun">(</span>msg<span class="pun">,</span> <span class="str">'success'</span><span class="pun">); }</span>
+  <span class="fn">error</span><span class="pun">(</span>msg: <span class="cls">string</span><span class="pun">)   {</span> <span class="kw">this</span>.<span class="fn">show</span><span class="pun">(</span>msg<span class="pun">,</span> <span class="str">'danger'</span><span class="pun">);  }</span>
+<span class="pun">}</span></pre>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== COMPONENTS ==================== -->
+  <section class="section" id="components">
+    <div class="section-label">Section 14</div>
+    <h2 class="section-title">
+      الـ Components — واجهة المستخدم
+      <span class="en">Angular Components</span>
+    </h2>
+
+    <div class="cards-grid">
+      <div class="card card-gold">
+        <span class="card-icon">📊</span>
+        <h3>DashboardComponent <span class="ar">الصفحة الرئيسية</span></h3>
+        <p>
+          بيجيب عدد الكتب والمؤلفين باستخدام <code>forkJoin</code>
+          عشان يعمل الـ requests في نفس الوقت (parallel)، ويعرض آخر 5 كتب و5 مؤلفين.
+        </p>
+      </div>
+      <div class="card card-sky">
+        <span class="card-icon">📚</span>
+        <h3>BookListComponent <span class="ar">قائمة الكتب</span></h3>
+        <p>
+          بيعرض الكتب مع دعم البحث الفوري والـ sort على أي column.
+          فيه confirm dialog قبل الحذف.
+        </p>
+      </div>
+      <div class="card card-jade">
+        <span class="card-icon">✍️</span>
+        <h3>BookFormComponent <span class="ar">فورم الكتاب</span></h3>
+        <p>
+          Component واحد بيتعامل مع إضافة وتعديل الكتاب.
+          بيحمّل قائمة المؤلفين، وعنده validation كامل قبل الإرسال.
+        </p>
+      </div>
+      <div class="card card-rust">
+        <span class="card-icon">👤</span>
+        <h3>AuthorListComponent <span class="ar">قائمة المؤلفين</span></h3>
+        <p>
+          بيعرض المؤلفين مع بحث على الاسم والـ bio.
+          نفس نمط BookListComponent.
+        </p>
+      </div>
+    </div>
+
+    <div class="code-wrap" style="margin-top:24px">
+      <span class="code-label">dashboard.component.ts — forkJoin Pattern</span>
+      <pre><span class="fn">ngOnInit</span><span class="pun">() {</span>
+  <span class="cmnt">// forkJoin: بيعمل الـ requests كلها مع بعض في نفس الوقت</span>
+  <span class="cmnt">// وبيستنى يرجعوا كلهم عشان يكمل</span>
+  <span class="fn">forkJoin</span><span class="pun">({</span>
+    authors: <span class="kw">this</span>.authorService.<span class="fn">getAll</span><span class="pun">(),</span>
+    books:   <span class="kw">this</span>.bookService.<span class="fn">getAll</span><span class="pun">()</span>
+  <span class="pun">}).</span><span class="fn">subscribe</span><span class="pun">({</span>
+    next: <span class="pun">({</span> authors<span class="pun">,</span> books <span class="pun">}) => {</span>
+      <span class="kw">this</span>.totalAuthors  = authors.length<span class="pun">;</span>
+      <span class="kw">this</span>.totalBooks    = books.length<span class="pun">;</span>
+      <span class="cmnt">// آخر 5 عناصر بالترتيب المعكوس (الأحدث أولاً)</span>
+      <span class="kw">this</span>.recentAuthors = authors.<span class="fn">slice</span><span class="pun">(-</span><span class="num">5</span><span class="pun">).</span><span class="fn">reverse</span><span class="pun">();</span>
+      <span class="kw">this</span>.recentBooks   = books.<span class="fn">slice</span><span class="pun">(-</span><span class="num">5</span><span class="pun">).</span><span class="fn">reverse</span><span class="pun">();</span>
+      <span class="kw">this</span>.loading       = <span class="kw">false</span><span class="pun">;</span>
+    <span class="pun">},</span>
+    error: <span class="pun">() => {</span>
+      <span class="kw">this</span>.loading = <span class="kw">false</span><span class="pun">;</span>
+      <span class="kw">this</span>.error   = <span class="kw">true</span><span class="pun">;</span>
+    <span class="pun">}</span>
+  <span class="pun">});</span>
+<span class="pun">}</span></pre>
+    </div>
+
+    <div class="code-wrap">
+      <span class="code-label">book-list.component.ts — Search + Sort</span>
+      <pre><span class="fn">applyFilter</span><span class="pun">() {</span>
+  <span class="kw">const</span> q = <span class="kw">this</span>.searchTerm.<span class="fn">trim</span><span class="pun">().</span><span class="fn">toLowerCase</span><span class="pun">();</span>
+
+  <span class="cmnt">// فلترة بالبحث</span>
+  <span class="kw">let</span> result = q
+    <span class="pun">?</span> <span class="kw">this</span>.books.<span class="fn">filter</span><span class="pun">(</span>b =>
+        b.title.<span class="fn">toLowerCase</span><span class="pun">().</span><span class="fn">includes</span><span class="pun">(</span>q<span class="pun">) ||</span>
+        b.isbn.<span class="fn">toLowerCase</span><span class="pun">().</span><span class="fn">includes</span><span class="pun">(</span>q<span class="pun">)  ||</span>
+        <span class="pun">(</span>b.authorName ?? <span class="str">''</span><span class="pun">).</span><span class="fn">toLowerCase</span><span class="pun">().</span><span class="fn">includes</span><span class="pun">(</span>q<span class="pun">)</span>
+      <span class="pun">)</span>
+    <span class="pun">: [...</span><span class="kw">this</span>.books<span class="pun">];</span>
+
+  <span class="cmnt">// Sort حسب الـ field المختار</span>
+  result.<span class="fn">sort</span><span class="pun">((</span>a<span class="pun">,</span> b<span class="pun">) => {</span>
+    <span class="kw">const</span> av = <span class="cls">String</span><span class="pun">(</span>a[<span class="kw">this</span>.sortField] ?? <span class="str">''</span><span class="pun">).</span><span class="fn">toLowerCase</span><span class="pun">();</span>
+    <span class="kw">const</span> bv = <span class="cls">String</span><span class="pun">(</span>b[<span class="kw">this</span>.sortField] ?? <span class="str">''</span><span class="pun">).</span><span class="fn">toLowerCase</span><span class="pun">();</span>
+    <span class="kw">return this</span>.sortDir === <span class="str">'asc'</span>
+      <span class="pun">?</span> av.<span class="fn">localeCompare</span><span class="pun">(</span>bv<span class="pun">)</span>
+      <span class="pun">:</span> bv.<span class="fn">localeCompare</span><span class="pun">(</span>av<span class="pun">);</span>
+  <span class="pun">});</span>
+
+  <span class="kw">this</span>.filtered = result<span class="pun">;</span>
+<span class="pun">}</span></pre>
+    </div>
+  </section>
+
+  <!-- ==================== ROUTING ==================== -->
+  <section class="section" id="routing">
+    <div class="section-label">Section 15</div>
+    <h2 class="section-title">
+      الـ Routing — التنقل بين الصفحات
+      <span class="en">Angular Routing with Lazy Loading</span>
+    </h2>
+
+    <p>
+      التطبيق بيستخدم <strong>Lazy Loading</strong> يعني كل component بيتحمّل بس لما
+      المستخدم يروح الصفحة دي. ده بيسرّع أول تحميل للتطبيق.
+    </p>
+
+    <div class="code-wrap">
+      <span class="code-label">app.routes.ts</span>
+      <pre><span class="kw">export const</span> routes: <span class="cls">Routes</span> = <span class="pun">[</span>
+  <span class="cmnt">// Redirect الـ root لـ dashboard</span>
+  <span class="pun">{</span> path: <span class="str">''</span><span class="pun">,</span> redirectTo: <span class="str">'dashboard'</span><span class="pun">,</span> pathMatch: <span class="str">'full'</span> <span class="pun">},</span>
+
+  <span class="cmnt">// Lazy Load — مش بيتحمّل غير لما تدخل الصفحة</span>
+  <span class="pun">{</span>
+    path: <span class="str">'dashboard'</span><span class="pun">,</span>
+    loadComponent: <span class="pun">() =></span>
+      <span class="kw">import</span><span class="pun">(</span><span class="str">'./components/dashboard/dashboard.component'</span><span class="pun">)</span>
+        .then<span class="pun">(</span>m => m.<span class="cls">DashboardComponent</span><span class="pun">)</span>
+  <span class="pun">},</span>
+  <span class="pun">{</span>
+    path: <span class="str">'authors'</span><span class="pun">,</span>
+    loadComponent: <span class="pun">() =></span>
+      <span class="kw">import</span><span class="pun">(</span><span class="str">'./components/authors/author-list/author-list.component'</span><span class="pun">)</span>
+        .then<span class="pun">(</span>m => m.<span class="cls">AuthorListComponent</span><span class="pun">)</span>
+  <span class="pun">},</span>
+  <span class="pun">{</span>
+    path: <span class="str">'books'</span><span class="pun">,</span>
+    loadComponent: <span class="pun">() =></span>
+      <span class="kw">import</span><span class="pun">(</span><span class="str">'./components/books/book-list/book-list.component'</span><span class="pun">)</span>
+        .then<span class="pun">(</span>m => m.<span class="cls">BookListComponent</span><span class="pun">)</span>
+  <span class="pun">},</span>
+  <span class="cmnt">// أي route تانية → رجّعه للـ dashboard</span>
+  <span class="pun">{</span> path: <span class="str">'**'</span><span class="pun">,</span> redirectTo: <span class="str">'dashboard'</span> <span class="pun">}</span>
+<span class="pun">];</span></pre>
+    </div>
+  </section>
+
+  <!-- ==================== ER ==================== -->
+  <section class="section" id="er">
+    <div class="section-label">Section 16</div>
+    <h2 class="section-title">
+      قاعدة البيانات — Entity Relationship
+      <span class="en">Database Design (ERD)</span>
+    </h2>
+
+    <p>
+      قاعدة البيانات بتتكون من جدولين: <strong>authors</strong> و<strong>books</strong>.
+      العلاقة بينهم هي <strong>One-to-Many</strong>: مؤلف واحد ممكن يكتب كتب كتير،
+      لكن كل كتاب ليه مؤلف واحد بس.
+    </p>
+
+    <div class="er-wrap">
+      <div style="display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:24px;padding:16px 0">
+
+        <!-- Authors Entity -->
+        <div class="entity-box entity-author">
+          <div class="entity-header">📋 authors</div>
+          <div class="entity-field">
+            <span><span class="field-key">🔑 id</span></span>
+            <span class="field-type">BIGSERIAL (PK)</span>
+          </div>
+          <div class="entity-field">
+            <span>name</span>
+            <span class="field-type">VARCHAR NOT NULL</span>
+          </div>
+          <div class="entity-field">
+            <span>bio</span>
+            <span class="field-type">TEXT</span>
+          </div>
+        </div>
+
+        <!-- Relation -->
+        <div class="er-relation">
+          <div style="text-align:center">
+            <div class="rel-label">1</div>
+            <div class="rel-line" style="width:30px;display:inline-block"></div>
+            <div style="display:inline-block;font-size:1.2rem;color:#c5952a">⟶</div>
+            <div class="rel-line" style="width:30px;display:inline-block"></div>
+            <div class="rel-label">N</div>
+            <div style="font-size:0.72rem;color:#888;margin-top:6px;font-family:'JetBrains Mono',monospace">One-to-Many</div>
+          </div>
+        </div>
+
+        <!-- Books Entity -->
+        <div class="entity-box entity-book">
+          <div class="entity-header">📚 books</div>
+          <div class="entity-field">
+            <span><span class="field-key">🔑 id</span></span>
+            <span class="field-type">BIGSERIAL (PK)</span>
+          </div>
+          <div class="entity-field">
+            <span>title</span>
+            <span class="field-type">VARCHAR NOT NULL</span>
+          </div>
+          <div class="entity-field">
+            <span>isbn</span>
+            <span class="field-type">VARCHAR UNIQUE NOT NULL</span>
+          </div>
+          <div class="entity-field">
+            <span>publication_year</span>
+            <span class="field-type">INT</span>
+          </div>
+          <div class="entity-field">
+            <span><span style="color:var(--sky)">🔗 author_id</span></span>
+            <span class="field-type">BIGINT (FK)</span>
+          </div>
+        </div>
+
+      </div>
+      <p style="color:var(--muted);font-size:0.82rem;margin-top:12px;text-align:center;direction:rtl">
+        <strong>author_id</strong> في جدول books هو الـ Foreign Key اللي بيربط الكتاب بمؤلفه
+      </p>
+    </div>
+
+    <div class="highlight-box hb-danger">
+      <span class="hb-icon">⚠️</span>
+      <strong>CascadeType.ALL:</strong>
+      لو حذفت مؤلف، هيتحذف كل كتبه تلقائياً!
+      ده بسبب <code>cascade = CascadeType.ALL</code> في الـ Author entity.
+      تأكد إنك ما تحذفش مؤلف وأنت مش عارف إن ليه كتب.
+    </div>
+  </section>
+
+  <!-- ==================== API REFERENCE ==================== -->
+  <section class="section" id="api">
+    <div class="section-label">Section 17</div>
+    <h2 class="section-title">
+      الـ API Reference الكامل
+      <span class="en">Complete REST API Reference</span>
+    </h2>
+
+    <p>كل الـ endpoints المتاحة في الـ Backend. الـ base URL هو <code>http://localhost:8080</code></p>
+
+    <h3 style="font-family:'Crimson Pro',serif;font-size:1.25rem;margin:24px 0 12px;color:var(--jade)">
+      📋 Authors API — <span dir="ltr" style="font-family:'JetBrains Mono',monospace;font-size:0.9rem">/api/authors</span>
+    </h3>
+    <div class="api-table-wrap">
+      <table>
+        <thead>
+          <tr><th>Method</th><th>Endpoint</th><th>الوصف</th><th>Request Body</th><th>Response</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="method method-get">GET</span></td>
+            <td><span class="endpoint-path">/api/authors</span></td>
+            <td dir="rtl">جلب كل المؤلفين</td>
+            <td style="color:var(--muted)">—</td>
+            <td><code>200 OK</code> + Array&lt;AuthorDTO&gt;</td>
+          </tr>
+          <tr>
+            <td><span class="method method-get">GET</span></td>
+            <td><span class="endpoint-path">/api/authors/{id}</span></td>
+            <td dir="rtl">جلب مؤلف بالـ ID</td>
+            <td style="color:var(--muted)">—</td>
+            <td><code>200 OK</code> + AuthorDTO</td>
+          </tr>
+          <tr>
+            <td><span class="method method-post">POST</span></td>
+            <td><span class="endpoint-path">/api/authors</span></td>
+            <td dir="rtl">إضافة مؤلف جديد</td>
+            <td><code>{"name":"","bio":""}</code></td>
+            <td><code>201 Created</code> + AuthorDTO</td>
+          </tr>
+          <tr>
+            <td><span class="method method-put">PUT</span></td>
+            <td><span class="endpoint-path">/api/authors/{id}</span></td>
+            <td dir="rtl">تعديل مؤلف</td>
+            <td><code>{"name":"","bio":""}</code></td>
+            <td><code>200 OK</code> + AuthorDTO</td>
+          </tr>
+          <tr>
+            <td><span class="method method-delete">DELETE</span></td>
+            <td><span class="endpoint-path">/api/authors/{id}</span></td>
+            <td dir="rtl">حذف مؤلف وكتبه</td>
+            <td style="color:var(--muted)">—</td>
+            <td><code>204 No Content</code></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3 style="font-family:'Crimson Pro',serif;font-size:1.25rem;margin:28px 0 12px;color:var(--sky)">
+      📚 Books API — <span dir="ltr" style="font-family:'JetBrains Mono',monospace;font-size:0.9rem">/api/books</span>
+    </h3>
+    <div class="api-table-wrap">
+      <table>
+        <thead>
+          <tr><th>Method</th><th>Endpoint</th><th>الوصف</th><th>Request Body</th><th>Response</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="method method-get">GET</span></td>
+            <td><span class="endpoint-path">/api/books</span></td>
+            <td dir="rtl">جلب كل الكتب</td>
+            <td style="color:var(--muted)">—</td>
+            <td><code>200 OK</code> + Array&lt;BookDTO&gt;</td>
+          </tr>
+          <tr>
+            <td><span class="method method-get">GET</span></td>
+            <td><span class="endpoint-path">/api/books/{id}</span></td>
+            <td dir="rtl">جلب كتاب بالـ ID</td>
+            <td style="color:var(--muted)">—</td>
+            <td><code>200 OK</code> + BookDTO</td>
+          </tr>
+          <tr>
+            <td><span class="method method-get">GET</span></td>
+            <td><span class="endpoint-path">/api/books/author/{authorId}</span></td>
+            <td dir="rtl">كتب مؤلف معين</td>
+            <td style="color:var(--muted)">—</td>
+            <td><code>200 OK</code> + Array&lt;BookDTO&gt;</td>
+          </tr>
+          <tr>
+            <td><span class="method method-post">POST</span></td>
+            <td><span class="endpoint-path">/api/books</span></td>
+            <td dir="rtl">إضافة كتاب جديد</td>
+            <td><code>{"title":"","isbn":"","publicationYear":0,"authorId":1}</code></td>
+            <td><code>201 Created</code> + BookDTO</td>
+          </tr>
+          <tr>
+            <td><span class="method method-put">PUT</span></td>
+            <td><span class="endpoint-path">/api/books/{id}</span></td>
+            <td dir="rtl">تعديل كتاب</td>
+            <td><code>{"title":"","isbn":"","publicationYear":0,"authorId":1}</code></td>
+            <td><code>200 OK</code> + BookDTO</td>
+          </tr>
+          <tr>
+            <td><span class="method method-delete">DELETE</span></td>
+            <td><span class="endpoint-path">/api/books/{id}</span></td>
+            <td dir="rtl">حذف كتاب</td>
+            <td style="color:var(--muted)">—</td>
+            <td><code>204 No Content</code></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3 style="font-family:'Crimson Pro',serif;font-size:1.15rem;margin:28px 0 12px;color:var(--rust)">
+      ⚠️ Error Responses
+    </h3>
+    <div class="api-table-wrap">
+      <table>
+        <thead>
+          <tr><th>HTTP Status</th><th>السبب</th><th>مثال</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>404 Not Found</code></td>
+            <td dir="rtl">المورد مش موجود</td>
+            <td><code>"Author not found with id 5"</code></td>
+          </tr>
+          <tr>
+            <td><code>400 Bad Request</code></td>
+            <td dir="rtl">بيانات غلط</td>
+            <td><code>"Author name must not be empty"</code></td>
+          </tr>
+          <tr>
+            <td><code>500 Internal Server Error</code></td>
+            <td dir="rtl">خطأ في السيرفر</td>
+            <td><code>"Internal Server Error"</code></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ==================== SETUP ==================== -->
+  <section class="section" id="setup">
+    <div class="section-label">Section 18</div>
+    <h2 class="section-title">
+      تشغيل المشروع خطوة بخطوة
+      <span class="en">Project Setup Guide</span>
+    </h2>
+
+    <div class="two-col">
+      <div>
+        <h3 style="font-family:'Crimson Pro',serif;font-size:1.2rem;margin-bottom:16px;color:var(--jade)">
+          🖥️ Backend Setup
+        </h3>
+        <ol class="steps">
+          <li>
+            <strong>تثبيت المتطلبات</strong>
+            <p>لازم يكون عندك Java 21 وPostgreSQL مثبتين.</p>
+          </li>
+          <li>
+            <strong>إنشاء قاعدة البيانات</strong>
+            <p>افتح pgAdmin أو psql وشغّل:</p>
+            <div class="code-wrap" style="margin-top:8px">
+              <pre style="padding:12px 16px;font-size:0.78rem"><span class="cls">CREATE DATABASE</span> project_full_lib<span class="pun">;</span></pre>
+            </div>
+          </li>
+          <li>
+            <strong>اضبط الـ application.properties</strong>
+            <p>تأكد إن الـ username والـ password صح في ملف <code>application.properties</code>.</p>
+          </li>
+          <li>
+            <strong>شغّل الـ Backend</strong>
+            <div class="code-wrap" style="margin-top:8px">
+              <pre style="padding:12px 16px;font-size:0.78rem"><span class="cmnt">// من مجلد library2</span>
+./mvnw spring-boot:run
+
+<span class="cmnt">// أو من IntelliJ: Run Library2Application</span></pre>
+            </div>
+          </li>
+          <li>
+            <strong>تأكد إنه شغّال</strong>
+            <p>افتح المتصفح على <code>http://localhost:8080/api/authors</code> — المفروض ترجع <code>[]</code></p>
+          </li>
+        </ol>
+      </div>
+      <div>
+        <h3 style="font-family:'Crimson Pro',serif;font-size:1.2rem;margin-bottom:16px;color:var(--sky)">
+          🌐 Frontend Setup
+        </h3>
+        <ol class="steps">
+          <li>
+            <strong>تثبيت Node.js و Angular CLI</strong>
+            <div class="code-wrap" style="margin-top:8px">
+              <pre style="padding:12px 16px;font-size:0.78rem">npm install -g @angular/cli</pre>
+            </div>
+          </li>
+          <li>
+            <strong>تثبيت الـ dependencies</strong>
+            <div class="code-wrap" style="margin-top:8px">
+              <pre style="padding:12px 16px;font-size:0.78rem"><span class="cmnt">// من مجلد library-frontend</span>
+npm install</pre>
+            </div>
+          </li>
+          <li>
+            <strong>تشغيل الـ Frontend</strong>
+            <div class="code-wrap" style="margin-top:8px">
+              <pre style="padding:12px 16px;font-size:0.78rem">ng serve
+
+<span class="cmnt">// أو</span>
+npm start</pre>
+            </div>
+          </li>
+          <li>
+            <strong>افتح في المتصفح</strong>
+            <p>روح على <code>http://localhost:4200</code> وهتلاقي الـ Dashboard.</p>
+          </li>
+        </ol>
+
+        <div class="highlight-box hb-warn" style="margin-top:16px">
+          <span class="hb-icon">⚠️</span>
+          <strong>مهم:</strong> الـ Backend لازم يكون شغّال <strong>أول</strong> قبل ما تفتح الـ Frontend،
+          وإلا الـ Dashboard هيطلع خطأ.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== STRUCTURE ==================== -->
+  <section class="section" id="structure">
+    <div class="section-label">Section 19</div>
+    <h2 class="section-title">
+      هيكل الملفات الكامل
+      <span class="en">Project File Structure</span>
+    </h2>
+
+    <div class="two-col">
+      <div>
+        <p style="margin-bottom:12px;font-weight:600;color:var(--jade)">🖥️ Backend</p>
+        <div class="tree">
+<span class="folder">library_full_back_end_spring/</span>
+└── <span class="folder">library2/</span>
+    ├── <span class="file-xml">pom.xml</span>                         <span style="color:#555">← Maven config</span>
+    └── <span class="folder">src/main/</span>
+        ├── <span class="folder">java/com/ntg/library2/</span>
+        │   ├── <span class="folder">Config/</span>
+        │   │   └── <span class="file-java">WebConfig.java</span>       <span style="color:#555">← CORS</span>
+        │   ├── <span class="folder">Controller/</span>
+        │   │   ├── <span class="file-java">AuthorController.java</span>
+        │   │   └── <span class="file-java">BookController.java</span>
+        │   ├── <span class="folder">DTO/</span>
+        │   │   ├── <span class="file-java">AuthorDTO.java</span>
+        │   │   └── <span class="file-java">BookDTO.java</span>
+        │   ├── <span class="folder">Entity/</span>
+        │   │   ├── <span class="file-java">Author.java</span>
+        │   │   └── <span class="file-java">Book.java</span>
+        │   ├── <span class="folder">Exception/</span>
+        │   │   ├── <span class="file-java">ErrorResponse.java</span>
+        │   │   └── <span class="file-java">GlobalExceptionHandler.java</span>
+        │   ├── <span class="folder">Reposatory/</span>
+        │   │   ├── <span class="file-java">AuthorRepository.java</span>
+        │   │   └── <span class="file-java">BookRepository.java</span>
+        │   ├── <span class="folder">Servise/</span>
+        │   │   ├── <span class="file-java">AuthorService.java</span>
+        │   │   └── <span class="file-java">BookService.java</span>
+        │   └── <span class="file-java">Library2Application.java</span>   <span style="color:#555">← main()</span>
+        └── <span class="folder">resources/</span>
+            └── <span class="file-props">application.properties</span>
+        </div>
+      </div>
+      <div>
+        <p style="margin-bottom:12px;font-weight:600;color:var(--sky)">🌐 Frontend</p>
+        <div class="tree">
+<span class="folder">library-frontend/</span>
+├── <span class="file-xml">package.json</span>                    <span style="color:#555">← NPM deps</span>
+├── <span class="file-xml">angular.json</span>                   <span style="color:#555">← Angular config</span>
+└── <span class="folder">src/app/</span>
+    ├── <span class="file-ts">app.component.ts</span>           <span style="color:#555">← Root component</span>
+    ├── <span class="file-html">app.component.html</span>         <span style="color:#555">← Navbar + Toast</span>
+    ├── <span class="file-ts">app.config.ts</span>              <span style="color:#555">← providers</span>
+    ├── <span class="file-ts">app.routes.ts</span>              <span style="color:#555">← Routing</span>
+    ├── <span class="folder">models/</span>
+    │   ├── <span class="file-ts">author.model.ts</span>
+    │   └── <span class="file-ts">book.model.ts</span>
+    ├── <span class="folder">services/</span>
+    │   ├── <span class="file-ts">author.service.ts</span>
+    │   ├── <span class="file-ts">book.service.ts</span>
+    │   └── <span class="file-ts">toast.service.ts</span>
+    └── <span class="folder">components/</span>
+        ├── <span class="folder">dashboard/</span>
+        │   ├── <span class="file-ts">dashboard.component.ts</span>
+        │   └── <span class="file-html">dashboard.component.html</span>
+        ├── <span class="folder">authors/</span>
+        │   ├── <span class="folder">author-list/</span>
+        │   └── <span class="folder">author-form/</span>
+        └── <span class="folder">books/</span>
+            ├── <span class="folder">book-list/</span>
+            └── <span class="folder">book-form/</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== FOOTER ==================== -->
+  <footer class="footer">
+    <p>
+      توثيق مشروع <strong>Library Management System</strong> — Spring Boot + Angular
+    </p>
+    <p style="margin-top:8px;font-size:0.78rem;opacity:0.5">
+      Java 21 · Spring Boot · Spring Data JPA · PostgreSQL · Angular 19 · TypeScript · Lombok · Bootstrap
+    </p>
+  </footer>
+
+</main>
+
+<a class="scroll-top" href="#" title="رجوع للأعلى">↑</a>
+
+</body>
+</html>
